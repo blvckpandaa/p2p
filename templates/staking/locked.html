@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="py-8 flex flex-col items-center justify-center min-h-[70vh]">
+    <div class="card p-6 max-w-lg mx-auto text-center">
+        <div class="flex justify-center mb-6">
+            <div class="bg-primary/30 p-4 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H9m3-3V9m0 0V7m0 2h2m-2 0H9" />
+                </svg>
+            </div>
+        </div>
+        
+        <h1 class="text-2xl font-bold mb-4">Стейкинг заблокирован</h1>
+        
+        <p class="mb-6 opacity-80">
+            Для получения доступа к стейкингу вам необходимо иметь хотя бы одно дерево уровня 5.
+        </p>
+        
+        <div class="bg-primary/30 p-4 rounded-lg mb-6">
+            <h2 class="font-semibold mb-2">Ваш прогресс:</h2>
+            <div class="flex justify-between items-center">
+                <span>Дерево уровня 5:</span>
+                <span class="flex items-center">
+                    {% if has_tree_level_5 %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-green-500">Выполнено</span>
+                    {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-red-500">Не выполнено</span>
+                    {% endif %}
+                </span>
+            </div>
+            
+            {% if highest_level_tree %}
+            <div class="mt-4">
+                <div class="text-sm opacity-80 mb-1">Ваше дерево самого высокого уровня:</div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        {% if highest_level_tree.type == 'CF' %}
+                        <img src="/static/images/cf_tree_{{ highest_level_tree.level }}.png" alt="CF Tree" class="w-8 h-8 mr-2">
+                        {% elif highest_level_tree.type == 'TON' %}
+                        <img src="/static/images/ton_tree.png" alt="TON Tree" class="w-8 h-8 mr-2">
+                        {% elif highest_level_tree.type == 'NOT' %}
+                        <img src="/static/images/not_tree.png" alt="NOT Tree" class="w-8 h-8 mr-2">
+                        {% endif %}
+                        <span>{{ highest_level_tree.get_type_display }}</span>
+                    </div>
+                    <span class="bg-primary/50 px-3 py-1 rounded-full text-sm">
+                        Уровень {{ highest_level_tree.level }}
+                    </span>
+                </div>
+                <div class="mt-2 bg-accent/20 text-accent p-2 rounded-lg text-sm">
+                    Вам нужно повысить уровень дерева до уровня 5 (нужно еще {{ 5 - highest_level_tree.level }} уровней)
+                </div>
+            </div>
+            {% else %}
+            <div class="mt-4 bg-accent/20 text-accent p-2 rounded-lg text-sm">
+                У вас пока нет деревьев. Получите дерево и повысьте его до уровня 5.
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="space-y-3">
+            <a href="/" class="block w-full bg-secondary hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition">
+                Вернуться на главную
+            </a>
+            <a href="/tree/{% if highest_level_tree %}{{ highest_level_tree.id }}/{% endif %}" 
+               class="block w-full bg-accent/80 hover:bg-accent text-dark py-3 rounded-lg font-semibold transition">
+                {% if highest_level_tree %}
+                Открыть моё дерево
+                {% else %}
+                Получить дерево
+                {% endif %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

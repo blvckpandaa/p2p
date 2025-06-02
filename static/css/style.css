@@ -1,0 +1,284 @@
+/* Основные цвета и переменные */
+:root {
+    --primary: #3D50C7;
+    --secondary: #6B75E6;
+    --accent: #5AFF75;
+    --background: #6B75E6;
+    --dark: #0D1F4A;
+    --text: #FFFFFF;
+}
+
+/* Анимации */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes drop {
+    0% { 
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(120px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shine {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* Общие стили */
+body {
+    background-color: var(--background);
+    background-image: url('/static/images/bg.png');
+    background-size: cover;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 70px;
+}
+
+/* Карточки и контейнеры */
+.card {
+    background-color: rgba(61, 80, 199, 0.3);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-hover:hover {
+    background-color: rgba(61, 80, 199, 0.4);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Статусы и индикаторы */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-active {
+    background-color: var(--accent);
+    box-shadow: 0 0 5px var(--accent);
+}
+
+.status-inactive {
+    background-color: #FF5A5A;
+    box-shadow: 0 0 5px #FF5A5A;
+}
+
+.status-pending {
+    background-color: #FFD15A;
+    box-shadow: 0 0 5px #FFD15A;
+}
+
+/* Анимации и эффекты */
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shine {
+    animation: shine 2s ease-in-out infinite;
+}
+
+/* Элементы дерева */
+.tree-container {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.tree-image {
+    max-width: 150px;
+    margin: 0 auto;
+    display: block;
+}
+
+.water-droplet {
+    position: absolute;
+    width: 10px;
+    height: 15px;
+    background-color: #5aafff;
+    border-radius: 50%;
+    animation: drop 2s linear forwards;
+    top: 0;
+}
+
+/* Нижняя навигация */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(13, 31, 74, 0.8);
+    backdrop-filter: blur(10px);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    z-index: 100;
+    padding: 10px 15px;
+}
+
+/* Кнопки */
+.btn {
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--secondary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: rgba(107, 117, 230, 0.8);
+}
+
+.btn-accent {
+    background-color: var(--accent);
+    color: var(--dark);
+}
+
+.btn-accent:hover {
+    background-color: rgba(90, 255, 117, 0.8);
+}
+
+/* Поля ввода */
+.input-field {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px 16px;
+    color: white;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-field:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent);
+}
+
+/* Модальные окна */
+.modal {
+    background-color: rgba(13, 31, 74, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+}
+
+/* Иконки деревьев и их стили */
+.tree-cf {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.tree-ton {
+    filter: drop-shadow(0 0 10px rgba(61, 139, 255, 0.3));
+}
+
+.tree-not {
+    filter: drop-shadow(0 0 10px rgba(90, 255, 117, 0.3));
+}
+
+/* Стили для страницы реферралов */
+.referral-card {
+    background-color: rgba(61, 80, 199, 0.2);
+    border-radius: 16px;
+    padding: 15px;
+    text-align: center;
+}
+
+.referral-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: var(--accent);
+}
+
+/* Стили для P2P биржи */
+.order-card {
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.order-buy {
+    border-left-color: var(--accent);
+}
+
+.order-sell {
+    border-left-color: var(--secondary);
+}
+
+.order-card:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Стили для истории транзакций */
+.transaction-success {
+    border-left: 3px solid var(--accent);
+}
+
+.transaction-pending {
+    border-left: 3px solid #FFD15A;
+}
+
+.transaction-failed {
+    border-left: 3px solid #FF5A5A;
+}
+
+/* Утилиты */
+.blur-bg {
+    backdrop-filter: blur(10px);
+}
+
+.glass {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-width: 640px) {
+    .tree-container {
+        height: 160px;
+    }
+    
+    .tree-image {
+        max-width: 120px;
+    }
+}
+
+/* Стили для темного режима Telegram */
+.dark-theme {
+    --text: #FFFFFF;
+}
+
+/* Стили для светлого режима Telegram */
+.light-theme {
+    --text: #0D1F4A;
+} 

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="py-8">
+    <h1 class="text-2xl font-bold mb-6 text-center">Мои деревья</h1>
+    
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {% for tree in trees %}
+        <div class="card p-5 relative">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-xl font-semibold">{{ tree.get_type_display }}</h2>
+                <span class="bg-primary/30 text-white px-3 py-1 rounded-full text-sm">
+                    Уровень {{ tree.level }}
+                </span>
+            </div>
+            
+            <div class="tree-container mb-4">
+                {% if tree.type == 'CF' %}
+                <img src="/static/images/tree_{{ tree.level }}.png" alt="CF Tree" class="tree-image animate-float">
+                {% elif tree.type == 'TON' %}
+                <img src="/static/images/tree.png" alt="TON Tree" class="tree-image animate-float">
+
+                {% endif %}
+            </div>
+            
+            <div class="space-y-2 mb-6">
+                <div class="flex justify-between">
+                    <span>Доход:</span>
+                    <span class="font-medium">{{ tree.get_current_income }} {{ tree.type }}/час</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Статус:</span>
+                    <span class="font-medium">
+                        {% if tree.is_watered %}
+                        <span class="status-indicator status-active"></span>Активно
+                        {% else %}
+                        <span class="status-indicator status-inactive"></span>Нужен полив
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Веток собрано:</span>
+                    <span class="font-medium">{{ tree.branches_collected }}</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <a href="{% url 'tree_detail' tree.id %}" class="btn btn-primary">
+                    Управление
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card p-6 col-span-full text-center">
+            <p>У вас еще нет деревьев. Давайте создадим первое!</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-8 text-center">
+        <a href="{% url 'shop' %}" class="btn btn-accent">
+            Купить новое дерево
+        </a>
+    </div>
+</div>
+{% endblock %} 

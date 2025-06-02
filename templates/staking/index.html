@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="py-8">
+    <h1 class="text-2xl font-bold mb-6 text-center">Стейкинг</h1>
+    
+    <div class="card p-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-4">
+                <div class="text-center">
+                    <div class="text-sm opacity-80">CF Токены</div>
+                    <div class="font-bold">{{ user.cf_balance }}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm opacity-80">TON Токены</div>
+                    <div class="font-bold">{{ user.ton_balance }}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm opacity-80">NOT Токены</div>
+                    <div class="font-bold">{{ user.not_balance }}</div>
+                </div>
+            </div>
+            <button onclick="showStakeModal()" class="bg-accent/80 hover:bg-accent text-dark px-4 py-2 rounded-lg text-sm font-medium">
+                Стейкинг
+            </button>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card p-4 text-center">
+            <div class="text-sm opacity-80 mb-1">Токенов в стейкинге</div>
+            <div class="text-3xl font-bold">{{ total_staked }}</div>
+        </div>
+        <div class="card p-4 text-center">
+            <div class="text-sm opacity-80 mb-1">Текущая доходность</div>
+            <div class="text-3xl font-bold">{{ current_apy }}%</div>
+            <div class="text-xs opacity-70">APY</div>
+        </div>
+        <div class="card p-4 text-center">
+            <div class="text-sm opacity-80 mb-1">Заработано всего</div>
+            <div class="text-3xl font-bold">{{ total_earned }}</div>
+        </div>
+    </div>
+    
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Стейкинг-планы</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% for plan in staking_plans %}
+            <div class="card p-4 flex flex-col h-full">
+                <div class="mb-3">
+                    <h3 class="font-semibold text-lg">{{ plan.name }}</h3>
+                    <div class="text-xs opacity-70">{{ plan.lock_period }} дней блокировки</div>
+                </div>
+                
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between">
+                        <span class="text-sm opacity-80">Мин. сумма:</span>
+                        <span class="text-sm">{{ plan.min_amount }} {{ plan.token_type }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm opacity-80">Макс. сумма:</span>
+                        <span class="text-sm">{{ plan.max_amount }} {{ plan.token_type }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm opacity-80">Доходность:</span>
+                        <span class="text-sm text-accent">{{ plan.apy }}% APY</span>
+                    </div>
+                </div>
+                
+                <div class="mt-auto">
+                    <button onclick="showStakeModal('{{ plan.id }}', '{{ plan.token_type }}', {{ plan.min_amount }}, {{ plan.max_amount }}, {{ plan.apy }}, {{ plan.lock_period }})" 
+                           class="w-full bg-secondary hover:bg-blue-600 text-white py-2 rounded-lg text-sm font-medium transition">
+                        Начать стейкинг
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div>
+        <h2 class="text-xl font-semibold mb-4">Ваши депозиты</h2>
+        <div class="card p-4">
+            <div class="space-y-2 mb-3">
+                <div class="flex justify-between text-sm font-medium opacity-80 p-2">
+                    <span>Токен</span>
+                    <span>Сумма</span>
+                    <span>APY</span>
+                    <span>Начало</span>
+                    <span>Окончание</span>
+                    <span>Статус</span>
+                </div>
+                <hr class="border-white/10">
+            </div>
+            
+            <div class="max-h-96 overflow-y-auto space-y-2">
+                {% for stake in user_stakes %}
+                <div class="p-2 hover:bg-white/5 rounded-lg transition">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm font-medium">{{ stake.token_type }}</div>
+                        <div class="text-sm">{{ stake.amount }} {{ stake.token_type }}</div>
+                        <div class="text-sm text-accent">{{ stake.apy }}%</div>
+                        <div class="text-sm">{{ stake.started_at|date:"d.m.Y" }}</div>
+                        <div class="text-sm">{{ stake.ends_at|date:"d.m.Y" }}</div>
+                        <div class="flex items-center">
+                            {% if stake.status == 'active' %}
+                            <span class="status-indicator status-active"></span>
+                            <span class="text-sm">Активен</span>
+                            {% elif stake.status == 'completed' %}
+                            <span class="status-indicator status-inactive"></span>
+                            <span class="text-sm">Завершен</span>
+                            {% elif stake.status == 'pending_withdrawal' %}
+                            <span class="status-indicator status-pending"></span>
+                            <span class="text-sm">Ожидает вывода</span>
+                            <button onclick="withdrawStake({{ stake.id }})" class="ml-2 bg-accent text-dark px-2 py-0.5 rounded text-xs">
+                                Вывести
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-8 opacity-70">
+                    У вас пока нет активных депозитов. Выберите стейкинг-план, чтобы начать зарабатывать.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно стейкинга -->
+    <div id="stakeModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+        <div class="bg-primary/90 backdrop-blur-lg p-6 rounded-2xl w-full max-w-md relative">
+            <button onclick="hideStakeModal()" class="absolute top-3 right-3 text-white/70 hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <h2 class="text-xl font-bold mb-4">Стейкинг токенов</h2>
+            
+            <form id="stakeForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Тип токена</label>
+                    <select id="token_type" name="token_type" class="w-full bg-white/10 border border-white/20 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-accent">
+                        <option value="CF">CF Token</option>
+                        <option value="TON">TON Token</option>
+                        <option value="NOT">NOT Token</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1">Сумма</label>
+                    <input type="number" id="amount" name="amount" min="1" step="1" 
+                           class="w-full bg-white/10 border border-white/20 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                           placeholder="Минимум: 100">
+                    <div id="amount-error" class="text-red-500 text-xs mt-1 hidden">
+                        Сумма должна быть в пределах мин. и макс. значений
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 p-3 rounded-lg space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm opacity-80">Доходность (APY):</span>
+                        <span id="apy-display" class="text-sm text-accent">10%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm opacity-80">Период блокировки:</span>
+                        <span id="lock-period-display" class="text-sm">30 дней</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm opacity-80">Ожидаемая прибыль:</span>
+                        <span id="expected-profit" class="text-sm">0 CF</span>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="plan_id" name="plan_id" value="">
+                
+                <div class="pt-2">
+                    <button type="button" onclick="submitStake()" 
+                            class="w-full bg-accent text-dark font-semibold py-3 rounded-lg hover:bg-green-500 transition">
+                        Подтвердить стейкинг
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    let currentPlanId = null;
+    let currentMinAmount = 100;
+    let currentMaxAmount = 10000;
+    let currentApy = 10;
+    let currentLockPeriod = 30;
+    
+    // Функция для показа модального окна стейкинга
+    function showStakeModal(planId = null, tokenType = 'CF', minAmount = 100, maxAmount = 10000, apy = 10, lockPeriod = 30) {
+        currentPlanId = planId;
+        currentMinAmount = minAmount;
+        currentMaxAmount = maxAmount;
+        currentApy = apy;
+        currentLockPeriod = lockPeriod;
+        
+        document.getElementById('plan_id').value = planId;
+        document.getElementById('token_type').value = tokenType;
+        document.getElementById('amount').min = minAmount;
+        document.getElementById('amount').max = maxAmount;
+        document.getElementById('amount').placeholder = 'Минимум: ' + minAmount;
+        
+        // Обновляем отображаемую информацию
+        document.getElementById('apy-display').textContent = apy + '%';
+        document.getElementById('lock-period-display').textContent = lockPeriod + ' дней';
+        
+        // Показываем модальное окно
+        document.getElementById('stakeModal').classList.remove('hidden');
+        
+        // Добавляем обработчик события для расчета ожидаемой прибыли
+        document.getElementById('amount').addEventListener('input', calculateExpectedProfit);
+    }
+    
+    // Функция для скрытия модального окна стейкинга
+    function hideStakeModal() {
+        document.getElementById('stakeModal').classList.add('hidden');
+        document.getElementById('amount-error').classList.add('hidden');
+    }
+    
+    // Функция для расчета ожидаемой прибыли
+    function calculateExpectedProfit() {
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const tokenType = document.getElementById('token_type').value;
+        
+        // Проверяем, что сумма в пределах допустимых значений
+        if (amount < currentMinAmount || amount > currentMaxAmount) {
+            document.getElementById('amount-error').classList.remove('hidden');
+        } else {
+            document.getElementById('amount-error').classList.add('hidden');
+        }
+        
+        // Рассчитываем ожидаемую прибыль
+        // APY = годовая процентная доходность, но период блокировки в днях
+        const profit = amount * (currentApy / 100) * (currentLockPeriod / 365);
+        document.getElementById('expected-profit').textContent = profit.toFixed(2) + ' ' + tokenType;
+    }
+    
+    // Функция для отправки запроса на стейкинг
+    function submitStake() {
+        const form = document.getElementById('stakeForm');
+        const formData = new FormData(form);
+        
+        // Проверяем, что сумма введена и в пределах допустимых значений
+        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        if (amount < currentMinAmount || amount > currentMaxAmount) {
+            document.getElementById('amount-error').classList.remove('hidden');
+            return;
+        }
+        
+        // Отправляем запрос на сервер
+        fetch('/staking/create/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Стейкинг успешно создан');
+                hideStakeModal();
+                location.reload();
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка при отправке запроса');
+        });
+    }
+    
+    // Функция для вывода средств из стейкинга
+    function withdrawStake(stakeId) {
+        if (!confirm('Вы уверены, что хотите вывести средства из стейкинга?')) {
+            return;
+        }
+        
+        // Отправляем запрос на сервер
+        fetch('/staking/withdraw/' + stakeId + '/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Средства успешно выведены');
+                location.reload();
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка при отправке запроса');
+        });
+    }
+    
+    // Функция для получения CSRF токена из cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
+
+{% endblock %} 

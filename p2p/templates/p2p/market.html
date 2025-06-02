@@ -1,0 +1,234 @@
+{% extends 'p2p/base.html' %}
+{% load static %}
+
+{% block title %}P2P Рынок{% endblock %}
+
+{% block content %}
+<div class="p2p-market">
+    <!-- Информация о балансе -->
+    <div class="balance-info card">
+        <div class="card-body">
+            <div class="info-block">
+                <span class="info-label">Создано CF:</span>
+                <span class="info-value token-cf">{{ user.cf_balance|floatformat:2 }}</span>
+            </div>
+            <div class="info-block">
+                <span class="info-label">Выращено:</span>
+                <span class="info-value">{{ user.staking_amount|default:"0" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filters card">
+        <div class="card-header">
+            <h2 class="card-title">Фильтры</h2>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'p2p:market' %}">
+                <div class="form-group">
+                    <label class="form-label">Тип ордера</label>
+                    <div class="btn-group">
+                        <button type="button" class="btn {% if not request.GET.type or request.GET.type == 'all' %}btn-primary{% endif %}" data-value="all">Все</button>
+                        <button type="button" class="btn {% if request.GET.type == 'buy' %}btn-primary{% endif %}" data-value="buy">Покупка</button>
+                        <button type="button" class="btn {% if request.GET.type == 'sell' %}btn-primary{% endif %}" data-value="sell">Продажа</button>
+                    </div>
+                    <input type="hidden" name="type" id="type-input" value="{{ request.GET.type|default:'all' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Токен</label>
+                    <div class="btn-group">
+                        <button type="button" class="btn {% if not request.GET.token_type or request.GET.token_type == 'all' %}btn-primary{% endif %}" data-value="all">Все</button>
+                        <button type="button" class="btn {% if request.GET.token_type == 'CF' %}btn-primary{% endif %}" data-value="CF">CF</button>
+                        <button type="button" class="btn {% if request.GET.token_type == 'TON' %}btn-primary{% endif %}" data-value="TON">TON</button>
+                        <button type="button" class="btn {% if request.GET.token_type == 'NOT' %}btn-primary{% endif %}" data-value="NOT">NOT</button>
+                    </div>
+                    <input type="hidden" name="token_type" id="token-input" value="{{ request.GET.token_type|default:'all' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Цена</label>
+                    <div class="price-range">
+                        <input type="number" name="min_price" class="form-control" placeholder="От" value="{{ request.GET.min_price }}">
+                        <span class="price-range-separator">-</span>
+                        <input type="number" name="max_price" class="form-control" placeholder="До" value="{{ request.GET.max_price }}">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">Применить фильтры</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Список ордеров -->
+    <div class="orders-list card">
+        <div class="card-header">
+            <h2 class="card-title">Ордера</h2>
+            <a href="{% url 'p2p:create_order' %}" class="btn btn-sm btn-primary">Создать ордер</a>
+        </div>
+        <div class="card-body">
+            {% if orders %}
+                <ul class="order-list">
+                    {% for order in orders %}
+                        <li class="order-item card order-type-{{ order.type }}">
+                            <div class="card-body">
+                                <div class="order-header">
+                                    <div class="order-user">
+                                        <i class="fas fa-user-circle"></i>
+                                        {{ order.user.username }}
+                                        {% if order.user.is_online %}
+                                            <span class="indicator indicator-online" title="Онлайн"></span>
+                                        {% else %}
+                                            <span class="indicator indicator-offline" title="Оффлайн"></span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="order-status status-{{ order.status }}">
+                                        {{ order.get_status_display }}
+                                    </div>
+                                </div>
+                                
+                                <div class="order-details">
+                                    <div class="order-detail-item">
+                                        <div class="order-detail-label">Тип</div>
+                                        <div class="order-detail-value">
+                                            {% if order.type == 'buy' %}
+                                                <i class="fas fa-arrow-down" style="color: var(--success-color);"></i> Покупка
+                                            {% else %}
+                                                <i class="fas fa-arrow-up" style="color: var(--danger-color);"></i> Продажа
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="order-detail-item">
+                                        <div class="order-detail-label">Токен</div>
+                                        <div class="order-detail-value token-{{ order.token_type|lower }}">
+                                            <img src="{% static 'p2p/img/'|add:order.token_type|lower|add:'-coin.svg' %}" class="token-icon" alt="{{ order.token_type }}">
+                                            {{ order.token_type }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="order-detail-item">
+                                        <div class="order-detail-label">Количество</div>
+                                        <div class="order-detail-value">{{ order.amount }}</div>
+                                    </div>
+                                    
+                                    <div class="order-detail-item">
+                                        <div class="order-detail-label">Цена за единицу</div>
+                                        <div class="order-detail-value">{{ order.price_per_unit }} TON</div>
+                                    </div>
+                                    
+                                    <div class="order-detail-item">
+                                        <div class="order-detail-label">Мин. количество</div>
+                                        <div class="order-detail-value">{{ order.min_amount }}</div>
+                                    </div>
+                                    
+                                    <div class="order-detail-item">
+                                        <div class="order-detail-label">Общая стоимость</div>
+                                        <div class="order-detail-value">{{ order.total_price }} TON</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-actions">
+                                    <a href="{% url 'p2p:order_detail' order.id %}" class="btn btn-primary">Подробнее</a>
+                                    
+                                    {% if order.user != user and order.status == 'active' %}
+                                        <a href="{% url 'p2p:buy_order' order.id %}" class="btn btn-success">
+                                            {% if order.type == 'buy' %}Продать{% else %}Купить{% endif %}
+                                        </a>
+                                    {% endif %}
+                                    
+                                    {% if order.user == user %}
+                                        <form method="post" action="{% url 'p2p:cancel_order' order.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Отменить</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-search fa-3x"></i>
+                    <p>Нет активных ордеров</p>
+                    <a href="{% url 'p2p:create_order' %}" class="btn btn-primary">Создать ордер</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Мои сделки -->
+    <div class="my-deals card">
+        <div class="card-header">
+            <h2 class="card-title">Мои сделки</h2>
+            <a href="{% url 'p2p:my_transactions' %}" class="btn btn-sm">Все сделки</a>
+        </div>
+        <div class="card-body">
+            {% if user_transactions %}
+                <ul class="transaction-list">
+                    {% for transaction in user_transactions %}
+                        <li class="transaction-item">
+                            <div class="transaction-type">
+                                {% if transaction.buyer == user %}
+                                    <i class="fas fa-arrow-down" style="color: var(--success-color);"></i> Покупка
+                                {% else %}
+                                    <i class="fas fa-arrow-up" style="color: var(--danger-color);"></i> Продажа
+                                {% endif %}
+                            </div>
+                            <div class="transaction-amount token-{{ transaction.token_type|lower }}">
+                                {{ transaction.amount }} {{ transaction.token_type }}
+                            </div>
+                            <div class="transaction-price">
+                                {{ transaction.total_price }} TON
+                            </div>
+                            <div class="transaction-status status-{{ transaction.status }}">
+                                {{ transaction.get_status_display }}
+                            </div>
+                            <div class="transaction-actions">
+                                <a href="{% url 'p2p:transaction_detail' transaction.id %}" class="btn btn-sm">Подробнее</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-exchange-alt fa-3x"></i>
+                    <p>У вас пока нет сделок</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Обработчики для фильтров
+        const typeButtons = document.querySelectorAll('.btn-group button[data-value]');
+        const typeInput = document.getElementById('type-input');
+        const tokenInput = document.getElementById('token-input');
+        
+        typeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const parent = this.parentElement;
+                const input = parent.nextElementSibling;
+                
+                // Убираем активный класс со всех кнопок в группе
+                parent.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                });
+                
+                // Добавляем активный класс текущей кнопке
+                this.classList.add('btn-primary');
+                
+                // Устанавливаем значение в скрытое поле
+                input.value = value;
+            });
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 100" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="grassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#7ed957;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#57c278;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M0,40 Q150,60 300,40 T600,50 T900,30 T1200,40 L1200,100 L0,100 Z" fill="url(#grassGradient)" />
+  <path d="M100,100 Q120,80 140,90 T180,85 T220,90 L220,100 Z" fill="#6fc662" opacity="0.6" />
+  <path d="M500,100 Q520,70 540,80 T580,75 T620,90 L620,100 Z" fill="#6fc662" opacity="0.6" />
+  <path d="M900,100 Q920,75 940,85 T980,75 T1020,90 L1020,100 Z" fill="#6fc662" opacity="0.6" />
+  <circle cx="200" cy="90" r="3" fill="#ffffff" opacity="0.8" />
+  <circle cx="350" cy="85" r="2" fill="#ffffff" opacity="0.7" />
+  <circle cx="700" cy="80" r="3" fill="#ffffff" opacity="0.8" />
+  <circle cx="850" cy="90" r="2" fill="#ffffff" opacity="0.7" />
+  <circle cx="1050" cy="85" r="3" fill="#ffffff" opacity="0.8" />
+</svg> 

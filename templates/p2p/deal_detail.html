@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Oxiri P2P - Детали сделки{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="/static/css/p2p.css">
+<script src="/static/js/p2p.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center mb-6">
+        <a href="{% url 'p2p_market' %}" class="mr-2 text-accent">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+        </a>
+        <h1 class="text-xl font-bold">
+            {% if is_buyer %}
+            Покупка {{ deal.token_type }}
+            {% else %}
+            Продажа {{ deal.token_type }}
+            {% endif %}
+        </h1>
+    </div>
+    
+    <!-- Статус сделки -->
+    <div class="card p-4 mb-6 bg-accent/20">
+        <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-accent mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <div>
+                <div class="font-semibold text-lg">Сделка завершена успешно</div>
+                <div class="text-sm opacity-70">{{ deal.created_at|date:"d.m.Y H:i" }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Левая колонка: Детали сделки -->
+        <div>
+            <!-- Детали сделки -->
+            <div class="card p-4 mb-6">
+                <h2 class="text-lg font-semibold mb-4">Детали сделки</h2>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-primary/20 p-3 rounded-lg">
+                        <div class="text-xs opacity-70">Количество:</div>
+                        <div class="font-semibold text-lg">{{ deal.amount }} {{ deal.token_type }}</div>
+                    </div>
+                    <div class="bg-primary/20 p-3 rounded-lg">
+                        <div class="text-xs opacity-70">Цена за 1 {{ deal.token_type }}:</div>
+                        <div class="font-semibold text-lg">{{ deal.price_per_unit }} ₽</div>
+                    </div>
+                    <div class="bg-primary/20 p-3 rounded-lg">
+                        <div class="text-xs opacity-70">Комиссия:</div>
+                        <div class="font-semibold text-lg">{{ deal.commission }} ₽</div>
+                    </div>
+                    <div class="bg-primary/20 p-3 rounded-lg">
+                        <div class="text-xs opacity-70">Общая сумма:</div>
+                        <div class="font-semibold text-lg">{{ deal.total_amount }} ₽</div>
+                    </div>
+                </div>
+                
+                <!-- Информация о контрагенте -->
+                <div class="mb-6">
+                    <div class="text-sm mb-1 opacity-70">
+                        {% if is_buyer %}Продавец{% else %}Покупатель{% endif %}:
+                    </div>
+                    <div class="flex items-center">
+                        {% if is_buyer %}
+                            {% if deal.seller.photo_url %}
+                            <img src="{{ deal.seller.photo_url }}" alt="{{ deal.seller }}" class="w-8 h-8 rounded-full mr-2">
+                            {% endif %}
+                            <div class="font-semibold">{{ deal.seller }}</div>
+                        {% else %}
+                            {% if deal.buyer.photo_url %}
+                            <img src="{{ deal.buyer.photo_url }}" alt="{{ deal.buyer }}" class="w-8 h-8 rounded-full mr-2">
+                            {% endif %}
+                            <div class="font-semibold">{{ deal.buyer }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Реквизиты платежа -->
+                <div class="mb-4">
+                    <div class="text-sm mb-1 opacity-70">Реквизиты для оплаты:</div>
+                    <div class="bg-primary/20 p-3 rounded-lg">
+                        <pre class="whitespace-pre-wrap">{{ deal.order.payment_details }}</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Информация о сделке -->
+            <div class="card p-4">
+                <h2 class="text-lg font-semibold mb-3">Информация</h2>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Все транзакции на P2P-бирже необратимы. Пожалуйста, убедитесь, что вы получили средства/токены перед завершением сделки.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                        <span>При возникновении спорных ситуаций, обратитесь в поддержку через Telegram-бота.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Правая колонка: Чат -->
+        <div class="card p-4">
+            <h2 class="text-lg font-semibold mb-4">Чат сделки</h2>
+            
+            <!-- Сообщения -->
+            <div class="chat-messages mb-4 overflow-y-auto" style="max-height: 400px;">
+                {% if chat_messages %}
+                    {% for message in chat_messages %}
+                        <div class="chat-message mb-3 {% if message.sender == user %}chat-message-mine text-right{% endif %}">
+                            <div class="chat-message-content inline-block max-w-xs md:max-w-sm p-3 rounded-lg {% if message.sender == user %}bg-accent/20 text-white ml-auto{% else %}bg-primary/20 text-white mr-auto{% endif %}">
+                                {{ message.content }}
+                                <div class="text-xs opacity-70 mt-1">
+                                    {{ message.created_at|date:"H:i, d.m.Y" }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center opacity-70 my-8">
+                        Нет сообщений в этой сделке
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Форма отправки сообщения -->
+            <form class="chat-form" action="{% url 'send_message' deal.id %}" method="post">
+                {% csrf_token %}
+                <div class="flex space-x-2">
+                    <input type="text" name="content" class="input-field flex-1" placeholder="Введите сообщение..." required>
+                    <button type="submit" class="bg-accent text-dark px-4 py-2 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Прокручиваем чат вниз при загрузке страницы
+        const chatMessages = document.querySelector('.chat-messages');
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Обработка формы отправки сообщения
+        const chatForm = document.querySelector('.chat-form');
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(chatForm);
+            const messageInput = chatForm.querySelector('input[name="content"]');
+            const messageContent = messageInput.value.trim();
+            
+            if (!messageContent) {
+                return;
+            }
+            
+            fetch(chatForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Добавляем сообщение в чат
+                    addMessageToChat(data.message_data);
+                    
+                    // Очищаем поле ввода
+                    messageInput.value = '';
+                    
+                    // Прокручиваем чат вниз
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Произошла ошибка при отправке сообщения', 'error');
+            });
+        });
+    });
+    
+    // Функция для добавления сообщения в чат
+    function addMessageToChat(messageData) {
+        const chatMessages = document.querySelector('.chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chat-message mb-3 chat-message-mine text-right';
+        
+        messageDiv.innerHTML = `
+            <div class="chat-message-content inline-block max-w-xs md:max-w-sm p-3 rounded-lg bg-accent/20 text-white ml-auto">
+                ${messageData.content}
+                <div class="text-xs opacity-70 mt-1">
+                    ${messageData.created_at}
+                </div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+    }
+</script>
+{% endblock %} 

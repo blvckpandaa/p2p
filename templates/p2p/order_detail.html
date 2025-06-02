@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Oxiri P2P - Детали ордера{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <div class="flex items-center mb-6">
+        <a href="{% url 'p2p_market' %}" class="mr-2 text-accent">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+        </a>
+        <h1 class="text-xl font-bold">
+            {% if order.type == 'buy' %}
+            Ордер на покупку
+            {% else %}
+            Ордер на продажу
+            {% endif %}
+        </h1>
+    </div>
+    
+    <!-- Карточка ордера -->
+    <div class="card p-4 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <span class="text-xs px-2 py-1 rounded-full {% if order.type == 'buy' %}bg-accent/20 text-accent{% else %}bg-secondary/20 text-white{% endif %}">
+                    {% if order.type == 'buy' %}ПОКУПКА{% else %}ПРОДАЖА{% endif %}
+                </span>
+                <span class="text-sm ml-2">{{ order.token_type }}</span>
+            </div>
+            <div class="text-sm">
+                <span class="status-indicator {% if order.is_active %}status-active{% else %}status-inactive{% endif %}"></span>
+                {{ order.created_at|date:"d.m.Y H:i" }}
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="bg-primary/20 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Количество:</div>
+                <div class="font-semibold text-lg">{{ order.amount }} {{ order.token_type }}</div>
+            </div>
+            <div class="bg-primary/20 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Цена за 1 {{ order.token_type }}:</div>
+                <div class="font-semibold text-lg">{{ order.price_per_unit }} ₽</div>
+            </div>
+            <div class="bg-primary/20 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Минимальная сумма:</div>
+                <div class="font-semibold text-lg">{{ order.min_amount }} ₽</div>
+            </div>
+            <div class="bg-primary/20 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Общая стоимость:</div>
+                <div class="font-semibold text-lg">{{ order.total_price }} ₽</div>
+            </div>
+        </div>
+        
+        <!-- Информация о продавце/покупателе -->
+        <div class="mb-4">
+            <div class="text-sm mb-1 opacity-70">
+                {% if order.type == 'buy' %}Покупатель{% else %}Продавец{% endif %}:
+            </div>
+            <div class="flex items-center">
+                {% if order.user.photo_url %}
+                <img src="{{ order.user.photo_url }}" alt="{{ order.user }}" class="w-8 h-8 rounded-full mr-2">
+                {% endif %}
+                <div class="font-semibold">{{ order.user }}</div>
+            </div>
+        </div>
+        
+        <!-- Реквизиты -->
+        <div class="mb-6">
+            <div class="text-sm mb-1 opacity-70">Реквизиты для оплаты:</div>
+            <div class="bg-primary/20 p-3 rounded-lg">
+                <pre class="whitespace-pre-wrap">{{ order.payment_details }}</pre>
+            </div>
+        </div>
+        
+        {% if order.user == user %}
+        <!-- Если пользователь является владельцем ордера -->
+        <form action="{% url 'toggle_order' %}" method="post" class="p2p-form">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+            <button type="submit" class="block w-full py-3 bg-primary/30 text-center rounded-lg">
+                {% if order.status == 'active' %}Отменить ордер{% else %}Активировать ордер{% endif %}
+            </button>
+        </form>
+        {% else %}
+        <!-- Если пользователь не является владельцем ордера -->
+        <form action="{% url 'buy_order' order.id %}" method="post" class="p2p-form">
+            {% csrf_token %}
+            <button type="submit" class="block w-full py-3 bg-accent text-dark font-semibold text-center rounded-lg">
+                {% if order.type == 'buy' %}Продать{% else %}Купить{% endif %} {{ order.token_type }}
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    
+    <!-- Условия сделки -->
+    <div class="card p-4">
+        <h2 class="text-lg font-semibold mb-3">Условия сделки</h2>
+        <ul class="space-y-2 text-sm">
+            <li class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                </svg>
+                <span>Срок действия ордера: <strong>{{ order.expires_at|date:"d.m.Y H:i" }}</strong></span>
+            </li>
+            <li class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
+                <span>Комиссия платформы: <strong>3%</strong> от суммы сделки</span>
+            </li>
+            <li class="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>Важно: убедитесь, что вы доверяете контрагенту перед совершением сделки</span>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,151 @@
+/**
+ * P2P Exchange Styles
+ */
+
+/* Карточки ордеров */
+.order-card {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.order-buy {
+    border-left: 3px solid var(--accent-color, #FFD700);
+}
+
+.order-sell {
+    border-left: 3px solid var(--secondary-color, #4CAF50);
+}
+
+/* Индикаторы статуса */
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.status-active {
+    background-color: #4CAF50;
+}
+
+.status-inactive {
+    background-color: #9e9e9e;
+}
+
+.status-pending {
+    background-color: #FFC107;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+/* Фильтры и сортировка */
+.filter-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.filter-label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+    opacity: 0.7;
+}
+
+.filter-input, .sort-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: white;
+    font-size: 14px;
+}
+
+/* Уведомления */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 300px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #333;
+    color: white;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.notification-show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification-hide {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.notification-message {
+    flex: 1;
+    padding-right: 10px;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+.notification-success {
+    background-color: #4CAF50;
+}
+
+.notification-error {
+    background-color: #F44336;
+}
+
+.notification-info {
+    background-color: #2196F3;
+}
+
+/* Мобильные стили */
+@media (max-width: 640px) {
+    .notification {
+        width: calc(100% - 40px);
+    }
+} 

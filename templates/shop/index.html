@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block title %}Oxiri P2P - Магазин{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <!-- Заголовок -->
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-xl font-bold">Магазин</h1>
+        <div class="flex space-x-2">
+            <div class="text-sm">
+                <span class="text-xs opacity-70">Баланс:</span>
+                <span class="font-semibold">{{ user.balance }} CF</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Категории товаров -->
+    <div class="grid grid-cols-3 gap-2 mb-6">
+        <a href="#trees" class="text-center py-2 rounded-lg bg-primary/50">
+            Деревья
+        </a>
+        <a href="#fertilizers" class="text-center py-2 rounded-lg bg-primary/30">
+            Удобрения
+        </a>
+        <a href="#boosters" class="text-center py-2 rounded-lg bg-primary/30">
+            Бустеры
+        </a>
+    </div>
+    
+    <!-- Раздел деревьев -->
+    <div id="trees" class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">Деревья</h2>
+        
+        <!-- CF Дерево -->
+        <div class="card p-4 mb-4">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="font-semibold">CF Дерево</h3>
+                    <p class="text-sm opacity-70">Базовое дерево</p>
+                </div>
+                {% if user_has_cf_tree %}
+                <span class="bg-secondary/20 px-3 py-1 rounded-full text-xs">
+                    Уже приобретено
+                </span>
+                {% else %}
+                <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                    Бесплатно
+                </span>
+                {% endif %}
+            </div>
+            
+            <div class="flex mb-4">
+                <div class="w-24 h-24 flex items-center justify-center">
+                    <img src="/static/images/tree_1.png" alt="CF Tree" class="h-20">
+                </div>
+                <div class="flex-1 ml-4">
+                    <div class="mb-2">
+                        <div class="text-xs opacity-70">Доход:</div>
+                        <div class="font-semibold">0.1 CF/час</div>
+                    </div>
+                    <div>
+                        <div class="text-xs opacity-70">Особенность:</div>
+                        <div class="text-sm">Можно улучшать до 5 уровня</div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if not user_has_cf_tree %}
+            <a href="/shop/buy/tree/cf/" class="block w-full py-2 bg-accent text-dark text-center rounded-lg font-semibold">
+                Получить бесплатно
+            </a>
+            {% else %}
+            <a href="/tree/{{ cf_tree.id }}/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                Перейти к дереву
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- TON Дерево -->
+        <div class="card p-4 mb-4">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="font-semibold">TON Дерево</h3>
+                    <p class="text-sm opacity-70">Премиум дерево</p>
+                </div>
+                {% if user_has_ton_tree %}
+                <span class="bg-secondary/20 px-3 py-1 rounded-full text-xs">
+                    Уже приобретено
+                </span>
+                {% else %}
+                <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                    1 TON
+                </span>
+                {% endif %}
+            </div>
+            
+            <div class="flex mb-4">
+                <div class="w-24 h-24 flex items-center justify-center">
+                    {% if user_has_ton_tree %}
+                    <img src="/static/images/tree_1.png" alt="TON Tree" class="h-20">
+                    {% else %}
+                    <img src="/static/images/ton_tree_locked.png" alt="TON Tree Locked" class="h-20 opacity-50">
+                    {% endif %}
+                </div>
+                <div class="flex-1 ml-4">
+                    <div class="mb-2">
+                        <div class="text-xs opacity-70">Доход:</div>
+                        <div class="font-semibold">0.001 TON/час</div>
+                    </div>
+                    <div>
+                        <div class="text-xs opacity-70">Особенность:</div>
+                        <div class="text-sm">Генерирует реальные TON токены</div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if not user_has_ton_tree %}
+            <a href="/shop/buy/tree/ton/" class="block w-full py-2 bg-accent text-dark text-center rounded-lg font-semibold">
+                Купить за 1 TON
+            </a>
+            {% else %}
+            <a href="/tree/{{ ton_tree.id }}/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                Перейти к дереву
+            </a>
+            {% endif %}
+        </div>
+        
+
+    </div>
+    
+    <!-- Раздел удобрений -->
+    <div id="fertilizers" class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">Удобрения</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Удобрение на 6 часов -->
+            <div class="card p-4">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-semibold">Базовое удобрение</h3>
+                        <p class="text-sm opacity-70">6 часов</p>
+                    </div>
+                    <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                        10 CF
+                    </span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm opacity-70">Эффект:</div>
+                        <div class="font-semibold">+50% к доходу</div>
+                    </div>
+                </div>
+                
+                <a href="/shop/buy/fertilizer/6/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                    Купить за 10 CF
+                </a>
+            </div>
+            
+            <!-- Удобрение на 12 часов -->
+            <div class="card p-4">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-semibold">Улучшенное удобрение</h3>
+                        <p class="text-sm opacity-70">12 часов</p>
+                    </div>
+                    <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                        18 CF
+                    </span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm opacity-70">Эффект:</div>
+                        <div class="font-semibold">+50% к доходу</div>
+                    </div>
+                </div>
+                
+                <a href="/shop/buy/fertilizer/12/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                    Купить за 18 CF
+                </a>
+            </div>
+            
+            <!-- Удобрение на 24 часа -->
+            <div class="card p-4">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-semibold">Премиум удобрение</h3>
+                        <p class="text-sm opacity-70">24 часа</p>
+                    </div>
+                    <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                        30 CF
+                    </span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm opacity-70">Эффект:</div>
+                        <div class="font-semibold">+50% к доходу</div>
+                    </div>
+                </div>
+                
+                <a href="/shop/buy/fertilizer/24/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                    Купить за 30 CF
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Раздел бустеров -->
+    <div id="boosters" class="mb-8">
+        <h2 class="text-lg font-semibold mb-4">Бустеры</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Автополив на 3 дня -->
+            <div class="card p-4">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-semibold">Автополив</h3>
+                        <p class="text-sm opacity-70">3 дня</p>
+                    </div>
+                    <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                        15 CF
+                    </span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm opacity-70">Эффект:</div>
+                        <div class="font-semibold">Автоматический полив</div>
+                    </div>
+                </div>
+                
+                <a href="/shop/buy/autowater/3/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                    Купить за 15 CF
+                </a>
+            </div>
+            
+            <!-- Автополив на 7 дней -->
+            <div class="card p-4">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-semibold">Автополив</h3>
+                        <p class="text-sm opacity-70">7 дней</p>
+                    </div>
+                    <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                        30 CF
+                    </span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm opacity-70">Эффект:</div>
+                        <div class="font-semibold">Автоматический полив</div>
+                    </div>
+                </div>
+                
+                <a href="/shop/buy/autowater/7/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                    Купить за 30 CF
+                </a>
+            </div>
+            
+            <!-- Автополив на 30 дней -->
+            <div class="card p-4">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-semibold">Автополив</h3>
+                        <p class="text-sm opacity-70">30 дней</p>
+                    </div>
+                    <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                        100 CF
+                    </span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm opacity-70">Эффект:</div>
+                        <div class="font-semibold">Автоматический полив</div>
+                    </div>
+                </div>
+                
+                <a href="/shop/buy/autowater/30/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                    Купить за 100 CF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

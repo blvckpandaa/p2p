@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Oxiri P2P - Дерево{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <!-- Верхняя навигация -->
+    <div class="flex items-center mb-6">
+        <a href="/" class="mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 class="text-xl font-bold">{{ tree.crypto_type|upper }} Дерево</h1>
+    </div>
+    
+    <!-- Информация о дереве -->
+    <div class="card p-4 mb-6">
+        <div class="tree-container">
+            <img src="/static/images/tree_{{ tree.level }}.png" alt="{{ tree.crypto_type|upper }} Tree" class="tree-image animate-float tree-{{ tree.crypto_type }}">
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-primary/30 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Уровень:</div>
+                <div class="font-semibold">{{ tree.level }}</div>
+            </div>
+            <div class="bg-primary/30 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Доход в час:</div>
+                <div class="font-semibold">{{ tree.income_per_hour }} {{ tree.crypto_type|upper }}/час</div>
+            </div>
+            {% if tree.crypto_type == 'cf' %}
+            <div class="bg-primary/30 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Веток собрано:</div>
+                <div class="font-semibold">{{ tree.branches_collected }} / 
+                    {% if tree.level == 1 %}5{% elif tree.level == 2 %}12{% elif tree.level == 3 %}30{% elif tree.level == 4 %}75{% else %}Max{% endif %}
+                </div>
+            </div>
+            {% endif %}
+            <div class="bg-primary/30 p-3 rounded-lg">
+                <div class="text-xs opacity-70">Последний полив:</div>
+                <div class="font-semibold">{{ tree.last_watered|date:"d.m.Y H:i" }}</div>
+            </div>
+        </div>
+        
+        <!-- Индикатор воды -->
+        <div class="mb-4">
+            <div class="flex justify-between text-xs mb-1">
+                <span>Вода</span>
+                <span>{{ tree.water_level }}%</span>
+            </div>
+            <div class="bg-primary/20 h-2 rounded-full overflow-hidden">
+                <div class="h-full bg-secondary" style="width: {{ tree.water_level }}%;"></div>
+            </div>
+        </div>
+        
+        <!-- Полив дерева -->
+        <div class="grid grid-cols-1 gap-3 mb-2">
+            <button data-tree-id="{{ tree.id }}" class="water-button bg-secondary hover:bg-secondary/80 transition text-center py-3 rounded-lg font-semibold">
+                Полить ({{ tree.water_cost }} CF)
+            </button>
+            
+            <div class="tree-info bg-primary/20 p-3 rounded-lg text-center text-sm"></div>
+        </div>
+    </div>
+    
+    <!-- Автоматический полив -->
+    <div class="card p-4 mb-6">
+        <h2 class="text-lg font-semibold mb-3">Автоматический полив</h2>
+        
+        {% if tree.auto_water_enabled %}
+        <div class="bg-primary/30 p-3 rounded-lg mb-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="text-sm">Автополив активен</div>
+                    <div class="text-xs opacity-70">Осталось: {{ tree.auto_water_remaining }} дней</div>
+                </div>
+                <span class="status-indicator status-active"></span>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-primary/30 p-3 rounded-lg mb-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="text-sm">Автополив не активен</div>
+                    <div class="text-xs opacity-70">Активируйте для автоматического полива дерева</div>
+                </div>
+                <span class="status-indicator status-inactive"></span>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-3 gap-2">
+            <a href="/tree/{{ tree.id }}/auto/3/" class="bg-primary/40 hover:bg-primary/60 transition text-center py-2 rounded-lg text-sm">
+                3 дня<br><span class="text-xs opacity-70">15 CF</span>
+            </a>
+            <a href="/tree/{{ tree.id }}/auto/7/" class="bg-primary/40 hover:bg-primary/60 transition text-center py-2 rounded-lg text-sm">
+                7 дней<br><span class="text-xs opacity-70">30 CF</span>
+            </a>
+            <a href="/tree/{{ tree.id }}/auto/30/" class="bg-primary/40 hover:bg-primary/60 transition text-center py-2 rounded-lg text-sm">
+                30 дней<br><span class="text-xs opacity-70">100 CF</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Удобрение дерева -->
+    {% if tree.crypto_type == 'cf' %}
+    <div class="card p-4 mb-6">
+        <h2 class="text-lg font-semibold mb-3">Удобрение</h2>
+        
+        {% if tree.fertilizer_active %}
+        <div class="bg-primary/30 p-3 rounded-lg mb-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="text-sm">Удобрение активно</div>
+                    <div class="text-xs opacity-70">Осталось: {{ tree.fertilizer_remaining }} часов</div>
+                </div>
+                <span class="status-indicator status-active"></span>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-primary/30 p-3 rounded-lg mb-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="text-sm">Удобрение не активно</div>
+                    <div class="text-xs opacity-70">Применение удобрения увеличивает доход на 50%</div>
+                </div>
+                <span class="status-indicator status-inactive"></span>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-3 gap-2">
+            <a href="/tree/{{ tree.id }}/fertilize/6/" class="bg-primary/40 hover:bg-primary/60 transition text-center py-2 rounded-lg text-sm">
+                6 часов<br><span class="text-xs opacity-70">10 CF</span>
+            </a>
+            <a href="/tree/{{ tree.id }}/fertilize/12/" class="bg-primary/40 hover:bg-primary/60 transition text-center py-2 rounded-lg text-sm">
+                12 часов<br><span class="text-xs opacity-70">18 CF</span>
+            </a>
+            <a href="/tree/{{ tree.id }}/fertilize/24/" class="bg-primary/40 hover:bg-primary/60 transition text-center py-2 rounded-lg text-sm">
+                24 часа<br><span class="text-xs opacity-70">30 CF</span>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Повышение уровня дерева -->
+    {% if tree.crypto_type == 'cf' and tree.level < 5 %}
+    <div class="card p-4 mb-6">
+        <h2 class="text-lg font-semibold mb-3">Повышение уровня</h2>
+        
+        <div class="bg-primary/30 p-3 rounded-lg mb-4">
+            <div class="flex justify-between">
+                <div class="text-sm">Прогресс улучшения:</div>
+                <div class="text-sm font-semibold">{{ tree.branches_collected }} / 
+                    {% if tree.level == 1 %}5{% elif tree.level == 2 %}12{% elif tree.level == 3 %}30{% elif tree.level == 4 %}75{% endif %}
+                </div>
+            </div>
+            <div class="mt-2 bg-primary/20 h-2 rounded-full overflow-hidden">
+                <div class="h-full bg-accent" style="width: 
+                    {% if tree.level == 1 %}
+                        {% widthratio tree.branches_collected 5 100 %}
+                    {% elif tree.level == 2 %}
+                        {% widthratio tree.branches_collected 12 100 %}
+                    {% elif tree.level == 3 %}
+                        {% widthratio tree.branches_collected 30 100 %}
+                    {% elif tree.level == 4 %}
+                        {% widthratio tree.branches_collected 75 100 %}
+                    {% endif %}%;">
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-2">
+            <a href="/tree/{{ tree.id }}/collect_branch/" class="bg-accent text-dark font-semibold py-3 rounded-lg text-center">
+                Собрать ветку ({{ tree.branch_cost }} CF)
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- История активности -->
+    <div class="card p-4">
+        <h2 class="text-lg font-semibold mb-3">История активности</h2>
+        
+        {% if tree_logs %}
+        <div class="space-y-2">
+            {% for log in tree_logs %}
+            <div class="bg-primary/20 p-3 rounded-lg flex justify-between items-center">
+                <div>
+                    <div class="text-sm">{{ log.action }}</div>
+                    <div class="text-xs opacity-70">{{ log.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                <div class="text-sm font-semibold">
+                    {% if log.reward %}+{{ log.reward }} {{ tree.crypto_type|upper }}{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4 opacity-70">
+            Пока нет записей активности
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Код для индикатора прогресса (анимация заполнения)
+        const progressBars = document.querySelectorAll('.bg-secondary, .bg-accent');
+        
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width 1s ease-in-out';
+                bar.style.width = width;
+            }, 300);
+        });
+    });
+</script>
+{% endblock %} 

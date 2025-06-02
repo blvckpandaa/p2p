@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Oxiri P2P - Главная{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <!-- Верхняя статистика -->
+    <div class="bg-primary/30 backdrop-blur-md rounded-xl p-3 mb-6">
+        <div class="text-center text-xs mb-1">Создано CF: {{ total_cf_created }}</div>
+        <div class="text-center font-bold">Выращено: {{ total_cf_grown }}</div>
+    </div>
+    
+    <!-- Текущий баланс CF -->
+    <div class="mb-6 bg-primary/30 backdrop-blur-md rounded-xl p-3 text-center">
+        <div>Выращено: {{ current_cf_grown }} CF</div>
+    </div>
+    
+    <!-- CF Дерево (основное) -->
+    <div class="mb-6">
+        <div class="card p-4 relative">
+            <div class="absolute right-4 top-4">
+                <a href="/tree/{{ cf_tree.id }}/" class="bg-primary/50 hover:bg-primary/70 transition px-3 py-1 rounded-full text-xs">
+                    Уровень: {{ cf_tree.level }}
+                </a>
+            </div>
+            
+            <div class="tree-container">
+                <img src="/static/images/cf_tree_{{ cf_tree.level }}.png" alt="CF Tree" class="tree-image animate-float">
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <a href="/tree/{{ cf_tree.id }}/" class="bg-secondary hover:bg-secondary/80 transition text-center py-2 rounded-lg text-sm">Полить</a>
+                <a href="/tree/{{ cf_tree.id }}/auto/" class="bg-secondary hover:bg-secondary/80 transition text-center py-2 rounded-lg text-sm">Автополив</a>
+                <a href="/tree/{{ cf_tree.id }}/fertilize/" class="bg-secondary hover:bg-secondary/80 transition text-center py-2 rounded-lg text-sm">Удобрить</a>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-primary/30 p-2 rounded-lg">
+                    <div class="text-xs opacity-70">Доход в час:</div>
+                    <div class="font-semibold">{{ cf_tree.income_per_hour }} CF/час</div>
+                </div>
+                <div class="bg-primary/30 p-2 rounded-lg">
+                    <div class="text-xs opacity-70">Веток собрано:</div>
+                    <div class="font-semibold">{{ cf_tree.branches_collected }} / 
+                        {% if cf_tree.level == 1 %}5{% elif cf_tree.level == 2 %}12{% elif cf_tree.level == 3 %}30{% elif cf_tree.level == 4 %}75{% else %}Max{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- TON Дерево -->
+    <div class="mb-6">
+        <div class="bg-primary/30 backdrop-blur-md rounded-xl p-3 text-center mb-2">
+            <div>Выращено: {{ ton_grown }} TON</div>
+        </div>
+        
+        {% if ton_tree %}
+        <div class="card p-4 relative">
+            <div class="absolute right-4 top-4">
+                <a href="/tree/{{ ton_tree.id }}/" class="bg-primary/50 hover:bg-primary/70 transition px-3 py-1 rounded-full text-xs">
+                    Подробнее
+                </a>
+            </div>
+            
+            <div class="tree-container">
+                <img src="/static/images/ton_tree.png" alt="TON Tree" class="tree-image animate-float">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-primary/30 p-2 rounded-lg">
+                    <div class="text-xs opacity-70">Доход в час:</div>
+                    <div class="font-semibold">{{ ton_tree.income_per_hour }} TON/час</div>
+                </div>
+                <div class="bg-primary/30 p-2 rounded-lg">
+                    <div class="text-xs opacity-70">Всего выращено:</div>
+                    <div class="font-semibold">{{ ton_grown }} TON</div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card p-4 flex flex-col items-center justify-center" style="min-height: 250px;">
+            <div class="mb-6">
+                <img src="/static/images/ton_tree_locked.png" alt="TON Tree Locked" class="w-24 h-24 opacity-70">
+            </div>
+            <p class="text-center mb-4">Для открытия дерева TON, оплатите 1 TON</p>
+            <a href="/shop/" class="bg-secondary hover:bg-secondary/80 transition text-center py-2 px-6 rounded-lg text-sm">
+                Купить дерево TON
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- NOT Дерево -->
+    <div class="mb-6">
+        <div class="bg-primary/30 backdrop-blur-md rounded-xl p-3 text-center mb-2">
+            <div>Выращено: {{ not_grown }} NOT</div>
+        </div>
+        
+        {% if not_tree %}
+        <div class="card p-4 relative">
+            <div class="absolute right-4 top-4">
+                <a href="/tree/{{ not_tree.id }}/" class="bg-primary/50 hover:bg-primary/70 transition px-3 py-1 rounded-full text-xs">
+                    Подробнее
+                </a>
+            </div>
+            
+            <div class="tree-container">
+                <img src="/static/images/not_tree.png" alt="NOT Tree" class="tree-image animate-float">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-primary/30 p-2 rounded-lg">
+                    <div class="text-xs opacity-70">Доход в час:</div>
+                    <div class="font-semibold">{{ not_tree.income_per_hour }} NOT/час</div>
+                </div>
+                <div class="bg-primary/30 p-2 rounded-lg">
+                    <div class="text-xs opacity-70">Всего выращено:</div>
+                    <div class="font-semibold">{{ not_grown }} NOT</div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card p-4 flex flex-col items-center justify-center" style="min-height: 250px;">
+            <div class="mb-6">
+                <img src="/static/images/not_tree_locked.png" alt="NOT Tree Locked" class="w-24 h-24 opacity-70">
+            </div>
+            <p class="text-center mb-4">Для открытия дерева NOT, оплатите 1000 NOT</p>
+            <a href="/shop/" class="bg-secondary hover:bg-secondary/80 transition text-center py-2 px-6 rounded-lg text-sm">
+                Купить дерево NOT
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- P2P Быстрые действия -->
+    <div class="grid grid-cols-2 gap-4">
+        <a href="/p2p/?action=buy" class="bg-accent text-dark font-semibold py-3 rounded-xl text-center">
+            Купить
+        </a>
+        <a href="/p2p/?action=sell" class="bg-secondary font-semibold py-3 rounded-xl text-center">
+            Продать
+        </a>
+    </div>
+</div>
+{% endblock %} 

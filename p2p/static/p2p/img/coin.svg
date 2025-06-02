@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+  <defs>
+    <linearGradient id="coinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <circle cx="25" cy="25" r="20" fill="url(#coinGradient)" filter="url(#glow)" />
+  <circle cx="25" cy="25" r="18" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.3" />
+  <text x="25" y="31" text-anchor="middle" fill="#ffffff" font-family="Arial" font-weight="bold" font-size="18">CF</text>
+</svg> 

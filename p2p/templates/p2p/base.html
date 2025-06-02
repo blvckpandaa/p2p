@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}P2P Биржа{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'p2p/css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="bg-decoration">
+        <div class="landscape"></div>
+        <!-- Монеты будут добавлены через JavaScript -->
+    </div>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="{% url 'main:index' %}" class="nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <div class="nav-text">Главная</div>
+        </a>
+        <a href="{% url 'p2p:market' %}" class="nav-item {% if request.resolver_match.app_name == 'p2p' %}active{% endif %}">
+            <div class="nav-icon"><i class="fas fa-exchange-alt"></i></div>
+            <div class="nav-text">P2P</div>
+        </a>
+        <a href="{% url 'users:profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <div class="nav-icon"><i class="fas fa-user"></i></div>
+            <div class="nav-text">Профиль</div>
+        </a>
+        <a href="{% url 'shop:index' %}" class="nav-item {% if request.resolver_match.url_name == 'shop' %}active{% endif %}">
+            <div class="nav-icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="nav-text">Магазин</div>
+        </a>
+    </nav>
+
+    <script src="{% static 'p2p/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 
