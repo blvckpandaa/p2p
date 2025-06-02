@@ -98,10 +98,17 @@ class TreeAdmin(admin.ModelAdmin):
 
     def income_per_hour_display(self, obj):
         """Отображение дохода в час."""
+        try:
+            value = float(obj.income_per_hour)
+        except Exception:
+            value = 0
+        # форматируем как строку заранее
+        value_str = f"{value:.2f}"
         return format_html(
-            '<span style="color: #28a745; font-weight: bold;">+{:.2f}/час</span>',
-            obj.income_per_hour
+            '<span style="color: #28a745; font-weight: bold;">+{}/час</span>',
+            value_str
         )
+
     income_per_hour_display.short_description = 'Доход'
     income_per_hour_display.admin_order_field = 'income_per_hour'
 

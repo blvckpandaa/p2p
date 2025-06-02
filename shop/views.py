@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 from trees.models import Tree
 from trees.views import get_current_user
@@ -11,85 +12,64 @@ def shop(request):
     """Страница магазина"""
     # Получаем все доступные товары
     items = ShopItem.objects.filter(is_active=True)
-    
+    user = get_current_user(request)
+    ton_tree = Tree.objects.filter(user=user, type='TON').first()
+
+
     return render(request, 'shop/index.html', {
         'items': items,
-        'user': request.user
+        'user': user,
+        'ton_tree': ton_tree,
+        'user_has_ton_tree': bool(ton_tree),
     })
 
-def buy_item(request, item_id):
-    """Покупка товара"""
-    if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'message': 'Требуется метод POST'})
-    
-    # Получаем товар
-    item = get_object_or_404(ShopItem, id=item_id, is_active=True)
-    user = request.user
-    
-    # Проверяем достаточно ли средств
-    if item.price_token_type == 'CF' and user.cf_balance < item.price:
-        return JsonResponse({'status': 'error', 'message': 'Недостаточно CF токенов'})
-    elif item.price_token_type == 'TON' and user.ton_balance < item.price:
-        return JsonResponse({'status': 'error', 'message': 'Недостаточно TON токенов'})
+@require_POST
+def buy_auto_water(request):
+    user = get_current_user(request)
+    tree_id = request.POST.get("tree_id")
+    days = int(request.POST.get("days", 1))  # 1 или 2 суток
+    ton_price = 1 if days == 1 else 2
+    tree = get_object_or_404(Tree, id=tree_id, user=user)
 
-    
-    # Списываем средства
-    if item.price_token_type == 'CF':
-        user.cf_balance -= item.price
-    elif item.price_token_type == 'TON':
-        user.ton_balance -= item.price
+    if user.ton_balance < ton_price:
+        return JsonResponse({"status": "error", "message": "Недостаточно TON"}, status=400)
+    # Включаем автополив
+    tree.auto_water_enabled = True
+    tree.auto_water_until = timezone.now() + timezone.timedelta(days=days)
+    tree.save(update_fields=["auto_water_enabled", "auto_water_until"])
+    user.ton_balance -= ton_price
+    user.save(update_fields=["ton_balance"])
+    return JsonResponse({"status": "success", "message": "Автополив активирован!"})
 
-    
-    user.save()
-    
-    # Обрабатываем покупку в зависимости от типа товара
-    valid_until = None
-    
-    if item.type == 'auto_water' and item.duration:
-        # Авто-полив - устанавливаем время действия
-        valid_until = timezone.now() + timezone.timedelta(hours=item.duration)
-        user.auto_water_until = valid_until
-        user.save()
-    
-    elif item.type == 'fertilizer' and item.duration:
-        # Удобрение - применяем к дереву CF
-        from trees.models import Tree
-        try:
-            tree = Tree.objects.get(user=user, type='CF')
-            tree.fertilized_until = timezone.now() + timezone.timedelta(hours=item.duration)
-            tree.save()
-        except Tree.DoesNotExist:
-            pass
-    
-    elif item.type in ['ton_tree']:
-        # Создаем новое дерево
-        from trees.models import Tree
-        tree_type = 'TON'
-        
-        # Проверяем, есть ли уже такое дерево
-        existing_tree = Tree.objects.filter(user=user, type=tree_type).exists()
-        if existing_tree:
-            return JsonResponse({'status': 'error', 'message': f'У вас уже есть дерево {tree_type}'})
-        
-        # Создаем новое дерево
-        Tree.objects.create(
-            user=user,
-            type=tree_type
-        )
-    
-    # Записываем покупку
-    purchase = Purchase.objects.create(
-        user=user,
-        item=item,
-        price_paid=item.price,
-        valid_until=valid_until
-    )
-    
-    return JsonResponse({
-        'status': 'success',
-        'message': f'Вы успешно приобрели {item.name}',
-        'new_balance': getattr(user, f"{item.price_token_type.lower()}_balance")
-    })
+@require_POST
+def buy_fertilizer(request):
+    user = get_current_user(request)
+    tree_id = request.POST.get("tree_id")
+    ton_price = 1
+    tree = get_object_or_404(Tree, id=tree_id, user=user)
+    if user.ton_balance < ton_price:
+        return JsonResponse({"status": "error", "message": "Недостаточно TON"}, status=400)
+    # Включаем удобрение на 24ч
+    tree.fertilized_until = timezone.now() + timezone.timedelta(hours=24)
+    tree.save(update_fields=["fertilized_until"])
+    user.ton_balance -= ton_price
+    user.save(update_fields=["ton_balance"])
+    return JsonResponse({"status": "success", "message": "Удобрение куплено!"})
+
+@require_POST
+def buy_branches(request):
+    user = get_current_user(request)
+    tree_id = request.POST.get("tree_id")
+    qty = int(request.POST.get("quantity", 1))
+    ton_price = qty  # 1 ветка = 1 TON
+    tree = get_object_or_404(Tree, id=tree_id, user=user)
+    if user.ton_balance < ton_price:
+        return JsonResponse({"status": "error", "message": "Недостаточно TON"}, status=400)
+    tree.branches_collected += qty
+    tree.save(update_fields=["branches_collected"])
+    user.ton_balance -= ton_price
+    user.save(update_fields=["ton_balance"])
+    return JsonResponse({"status": "success", "message": f"Куплено веток: {qty}"})
 
 def buy_ton_tree(request):
     user = get_current_user(request)

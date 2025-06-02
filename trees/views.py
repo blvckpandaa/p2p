@@ -26,42 +26,48 @@ def get_current_user(request):
 
 
 def home(request):
-    """
-    Главная страница: показывает CF- и TON-деревья пользователя.
-    """
     user = get_current_user(request)
     if not user:
-        # Если пользователь не залогинен — отдаём шаблон с предложением авторизоваться.
         return render(request, "not_authenticated.html")
 
-    # --- CF-деревья ---
     cf_trees = Tree.objects.filter(user=user, type="CF")
     if not cf_trees.exists():
-
         Tree.objects.create(user=user, type="CF")
         cf_trees = Tree.objects.filter(user=user, type="CF")
 
-    # --- TON-деревья ---
     ton_trees = Tree.objects.filter(user=user, type="TON")
 
-    # Текущая активная раздача TON (самая «поздняя» с is_active=True)
     active_distribution = TonDistribution.objects.filter(is_active=True).last()
-
-    # Считаем, сколько пользователей участвуют в TON-раздаче (те, у кого есть хотя бы одно TON-дерево)
     participants_count = (
         TelegramUser.objects.filter(trees__type="TON").distinct().count()
     ) or 0
 
-    # Если есть активная раздача и есть участники, считаем, сколько TON выдаётся
-    # одному участнику за 1 час.
     ton_per_hour_per_user = None
     if active_distribution and participants_count > 0:
         total_per_user = (active_distribution.total_amount / Decimal(participants_count))
         ton_per_hour_per_user = (total_per_user / Decimal(active_distribution.duration_hours))
 
+    # Собираем нужные значения для каждого CF-дерева
+    cf_tree_infos = []
+    for tree in cf_trees:
+        cf_tree_infos.append({
+            "id": tree.id,
+            "level": tree.level,
+            "income_per_hour": float(tree.income_per_hour),
+            "branches_collected": tree.branches_collected,
+            "last_watered": tree.last_watered,
+            "water_percent": tree.get_water_percent(),
+            "pending_income": float(tree.get_pending_income()),
+            "is_watered": tree.is_watered(),
+        })
+
+    # Аналогично можешь добавить для TON, если хочешь отображать процент и доход
+    # ton_tree_infos = [...]
+
     return render(request, "home.html", {
         "user": user,
-        "cf_trees": cf_trees,
+        "cf_trees": cf_tree_infos,
+        # "ton_trees": ton_tree_infos, # если сделаешь аналогично
         "ton_trees": ton_trees,
         "active_distribution": active_distribution,
         "participants_count": participants_count,
@@ -95,6 +101,8 @@ def tree_detail(request, tree_id):
         "is_watered": is_watered,
         "is_fertilized": is_fertilized,
         "can_upgrade": can_upgrade,
+        "water_percent": tree.get_water_percent(),  # <--- новый %
+        "pending_income": float(tree.get_pending_income()),
     }
 
     # --- Логи дерева ---
@@ -133,13 +141,6 @@ def tree_detail(request, tree_id):
 
 
 def water_tree(request, tree_id):
-    """
-    AJAX-обработчик: полив CF- или TON-дерева.
-    Должен возвращать JSON с ключами:
-      - branch_dropped: True/False
-      - amount_cf (если CF-дерево)
-      - amount_ton (если TON-дерево и есть активная раздача TON)
-    """
     user = get_current_user(request)
     if not user:
         return JsonResponse({"status": "error", "message": "Сначала авторизуйтесь"}, status=403)
@@ -149,8 +150,6 @@ def water_tree(request, tree_id):
     if request.method != "POST":
         return JsonResponse({"status": "error", "message": "Требуется метод POST"}, status=400)
 
-    # Предполагается, что ваш метод Tree.water() возвращает словарь вида:
-    # {"branch_dropped": bool, "amount_cf": Decimal, "amount_ton": Decimal}
     result = tree.water()
 
     response_data = {
@@ -159,16 +158,12 @@ def water_tree(request, tree_id):
         "is_watered": True,
         "branch_dropped": result.get("branch_dropped", False),
         "branches_collected": tree.branches_collected,
+        "amount_cf": float(result.get("amount_cf", 0)),
+        "amount_ton": float(result.get("amount_ton", 0)),
+        # Новые поля для обновления на фронте:
+        "water_percent": tree.get_water_percent(),
+        "pending_income": float(tree.get_pending_income()),
     }
-
-    if result.get("amount_cf") and result["amount_cf"] > 0:
-        response_data["amount_cf"] = float(result["amount_cf"])
-        response_data["message"] += f" +{float(result['amount_cf']):.2f} CF"
-
-    if result.get("amount_ton") and result["amount_ton"] > 0:
-        response_data["amount_ton"] = float(result["amount_ton"])
-        response_data["message"] += f" +{float(result['amount_ton']):.8f} TON"
-
     return JsonResponse(response_data)
 
 

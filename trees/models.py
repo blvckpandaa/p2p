@@ -1,5 +1,3 @@
-# trees/models.py
-
 import random
 from decimal import Decimal
 from django.db import models
@@ -24,13 +22,14 @@ class Tree(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     BRANCH_DROP_CHANCE = 0.10  # 10% шанс получить ветку
+    WATER_DURATION = 5  # Сколько часов длится "полив" (100% воды)
 
     def is_watered(self):
         """Проверяем, не истёк ли период полива (5 часов)."""
         if not self.last_watered:
             return False
         now = timezone.now()
-        expiry = self.last_watered + timezone.timedelta(hours=5)
+        expiry = self.last_watered + timezone.timedelta(hours=self.WATER_DURATION)
         return now < expiry
 
     def is_fertilized(self):
@@ -40,11 +39,6 @@ class Tree(models.Model):
         return timezone.now() < self.fertilized_until
 
     def can_upgrade(self):
-        """
-        Проверяет, хватает ли веток для перехода на следующий уровень.
-        Допустим, у вас в settings.GAME_SETTINGS["TREE_LEVELS"] хранится словарь с условием:
-          {1: {"branches": 0, "income": 1.0}, 2: {"branches": 5, "income": 1.5}, ...}
-        """
         from django.conf import settings
         next_level = self.level + 1
         levels = settings.GAME_SETTINGS.get("TREE_LEVELS", {})
@@ -54,9 +48,6 @@ class Tree(models.Model):
         return self.branches_collected >= required_branches
 
     def upgrade(self):
-        """
-        Повышает уровень дерева (если хватает веток). Списывает нужные ветки и пересчитывает income_per_hour.
-        """
         from django.conf import settings
         levels = settings.GAME_SETTINGS.get("TREE_LEVELS", {})
         next_level = self.level + 1
@@ -67,69 +58,86 @@ class Tree(models.Model):
         if self.branches_collected < required_branches:
             return False
 
-        # Списываем ветки
         self.branches_collected -= required_branches
-        # Увеличиваем уровень
         self.level = next_level
-        # Пересчитываем доход (берём из GAME_SETTINGS формулу или множитель)
         self.income_per_hour = Decimal(levels[next_level]["income"])
         self.save(update_fields=["level", "branches_collected", "income_per_hour"])
         return True
 
+    def get_pending_income(self):
+        """
+        Считает, сколько CF/TON накопилось с прошлого полива (но не больше, чем за WATER_DURATION часов).
+        """
+        now = timezone.now()
+        if not self.last_watered:
+            return Decimal('0.0000')
+        time_delta = now - self.last_watered
+        hours_passed = min(time_delta.total_seconds() / 3600, self.WATER_DURATION)
+        pending_income = (self.income_per_hour * Decimal(hours_passed)).quantize(Decimal('0.0000'))
+        return pending_income
+
+    def get_water_percent(self):
+        """
+        Возвращает текущий процент воды (100% сразу после полива, линейно уменьшается до 0% за WATER_DURATION часов).
+        """
+        if not self.last_watered:
+            return 0
+        now = timezone.now()
+        time_delta = now - self.last_watered
+        hours_passed = min(time_delta.total_seconds() / 3600, self.WATER_DURATION)
+        percent = max(0, 100 - int((hours_passed / self.WATER_DURATION) * 100))
+        return percent
+
     def water(self):
         """
         Полив дерева:
-          1. Обновляем last_watered = now
-          2. Генерируем ветку с вероятностью BRANCH_DROP_CHANCE
-          3. Начисляем пользователю:
-             - CF: income_per_hour * 5 часов сразу в cf_balance
-             - TON: только если есть активная раздача, считаем свою долю
+          1. Начисляем накопленный доход (CF или TON) только за реально прошедшее время с последнего полива.
+          2. Обновляем last_watered = now и сбрасываем "воду" на 100%.
+          3. Генерируем ветку с вероятностью BRANCH_DROP_CHANCE.
         Возвращает словарь:
           {"branch_dropped": bool, "amount_cf": Decimal, "amount_ton": Decimal}
         """
         now = timezone.now()
-        self.last_watered = now
-        self.save(update_fields=["last_watered"])
+        amount_cf = Decimal('0')
+        amount_ton = Decimal('0')
 
-        # Попытка выпадения ветки
+        if self.type == "CF":
+            amount_cf = self.get_pending_income()
+            user = self.user
+            if amount_cf > 0:
+                user.cf_balance += amount_cf
+                user.save(update_fields=["cf_balance"])
+        elif self.type == "TON":
+            from .models import TonDistribution
+            active_qs = TonDistribution.objects.filter(is_active=True)
+            if active_qs.exists():
+                dist = active_qs.last()
+                participants_count = TelegramUser.objects.filter(trees__type="TON").distinct().count() or 0
+                if participants_count > 0:
+                    total_per_user = (dist.total_amount / Decimal(participants_count))
+                    ton_per_hour = (total_per_user / Decimal(dist.duration_hours)).quantize(Decimal('0.00000001'))
+                    # Только за реально прошедшее время, не более WATER_DURATION часов
+                    now = timezone.now()
+                    if not self.last_watered:
+                        hours_passed = 0
+                    else:
+                        hours_passed = min((now - self.last_watered).total_seconds() / 3600, self.WATER_DURATION)
+                    amount_ton = (ton_per_hour * Decimal(hours_passed)).quantize(Decimal('0.00000001'))
+                    user = self.user
+                    if amount_ton > 0:
+                        user.ton_balance += amount_ton
+                        user.save(update_fields=["ton_balance"])
+
+        # Ветка с вероятностью
         branch_dropped = False
         if random.random() < self.BRANCH_DROP_CHANCE:
             branch_dropped = True
             self.branches_collected += 1
             self.save(update_fields=["branches_collected"])
 
-        amount_cf = Decimal('0')
-        amount_ton = Decimal('0')
-
-        # Если CF-дерево — начисляем CF
-        if self.type == "CF":
-            # Например, пользователь получает income_per_hour * 5 за этот полив
-            total_cf = (self.income_per_hour * Decimal(5)).quantize(Decimal('0.0000'))
-            user = self.user
-            user.cf_balance = user.cf_balance + total_cf
-            user.save(update_fields=["cf_balance"])
-            amount_cf = total_cf
-
-        # Если TON-дерево — начисляем TON только если есть активная раздача
-        elif self.type == "TON":
-            from .models import TonDistribution
-            active_qs = TonDistribution.objects.filter(is_active=True)
-            if active_qs.exists():
-                dist = active_qs.last()
-                # Сколько участников (сколько людей с TON-деревьями)
-                participants_count = TelegramUser.objects.filter(trees__type="TON").distinct().count() or 0
-                if participants_count > 0:
-                    # Доля пользователя за весь период
-                    total_per_user = (dist.total_amount / Decimal(participants_count))
-                    # За 1 час
-                    ton_per_hour = (total_per_user / Decimal(dist.duration_hours)).quantize(Decimal('0.00000001'))
-                    # За 5 часов
-                    ton_for_5h = (ton_per_hour * Decimal(5)).quantize(Decimal('0.00000001'))
-                    # Начисляем
-                    user = self.user
-                    user.ton_balance = user.ton_balance + ton_for_5h
-                    user.save(update_fields=["ton_balance"])
-                    amount_ton = ton_for_5h
+        # Сохраняем время последнего полива
+        self.last_watered = now
+        self.save(update_fields=["last_watered"])
 
         return {
             "branch_dropped": branch_dropped,
@@ -139,24 +147,12 @@ class Tree(models.Model):
 
 
 class TonDistribution(models.Model):
-    """
-    Модель «раздачи» TON:
-      - total_amount: общее количество TON в этой раздаче
-      - duration_hours: сколько часов действует
-      - is_active: True до тех пор, пока админ не нажмёт «Выполнить раздачу»
-      - created_at: дата/время создания
-    Метод distribute() должен пометить is_active=False и, возможно, разослать уведомления.
-    """
     total_amount = models.DecimalField(max_digits=20, decimal_places=8)
     duration_hours = models.PositiveIntegerField(default=24)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def distribute(self):
-        """
-        Вызывается из админки, переводит раздачу в is_active=False
-        Возвращает: сколько получил каждый пользователь (за весь период)
-        """
         if not self.is_active:
             return None
         from users.models import User as TelegramUser
