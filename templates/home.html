@@ -1,40 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CryptoFarm — Мои деревья{% endblock %}
 
 {% block content %}
-<div class="py-8">
+<div class="py-8 max-w-4xl mx-auto">
     <h1 class="text-2xl font-bold mb-6 text-center">Мои деревья</h1>
-    
+
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {% for tree in trees %}
+        {# --- CF-деревья --- #}
+        {% for tree in cf_trees %}
         <div class="card p-5 relative">
             <div class="flex justify-between items-start mb-4">
-                <h2 class="text-xl font-semibold">{{ tree.get_type_display }}</h2>
+                <h2 class="text-xl font-semibold">CF-Дерево</h2>
                 <span class="bg-primary/30 text-white px-3 py-1 rounded-full text-sm">
                     Уровень {{ tree.level }}
                 </span>
             </div>
-            
-            <div class="tree-container mb-4">
-                {% if tree.type == 'CF' %}
-                <img src="/static/images/tree_{{ tree.level }}.png" alt="CF Tree" class="tree-image animate-float">
-                {% elif tree.type == 'TON' %}
-                <img src="/static/images/tree.png" alt="TON Tree" class="tree-image animate-float">
 
-                {% endif %}
+            <div class="tree-container mb-4">
+                <img src="/static/images/tree_{{ tree.level }}.png"
+                     alt="CF Tree"
+                     class="tree-image animate-float">
             </div>
-            
+
             <div class="space-y-2 mb-6">
                 <div class="flex justify-between">
                     <span>Доход:</span>
-                    <span class="font-medium">{{ tree.get_current_income }} {{ tree.type }}/час</span>
+                    <span class="font-medium">{{ tree.income_per_hour }} CF/час</span>
                 </div>
                 <div class="flex justify-between">
                     <span>Статус:</span>
                     <span class="font-medium">
                         {% if tree.is_watered %}
-                        <span class="status-indicator status-active"></span>Активно
+                            <span class="status-indicator status-active"></span>Активно
                         {% else %}
-                        <span class="status-indicator status-inactive"></span>Нужен полив
+                            <span class="status-indicator status-inactive"></span>Нужен полив
                         {% endif %}
                     </span>
                 </div>
@@ -43,24 +44,92 @@
                     <span class="font-medium">{{ tree.branches_collected }}</span>
                 </div>
             </div>
-            
+
             <div class="flex justify-center">
-                <a href="{% url 'tree_detail' tree.id %}" class="btn btn-primary">
+                <a href="{% url 'tree_detail' tree.id %}"
+                   class="bg-accent text-dark py-2 px-4 rounded-lg hover:bg-accent/80 transition">
                     Управление
                 </a>
             </div>
         </div>
-        {% empty %}
-        <div class="card p-6 col-span-full text-center">
-            <p>У вас еще нет деревьев. Давайте создадим первое!</p>
+        {% endfor %}
+
+        {# --- TON-деревья --- #}
+        {% for tree in ton_trees %}
+        <div class="card p-5 relative">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-xl font-semibold">TON-Дерево</h2>
+                <span class="bg-primary/30 text-white px-3 py-1 rounded-full text-sm">
+                    Уровень {{ tree.level }}
+                </span>
+            </div>
+
+            <div class="tree-container mb-4">
+                <img src="/static/images/tree_ton_{{ tree.level }}.png"
+                     alt="TON Tree"
+                     class="tree-image animate-float">
+            </div>
+
+            <div class="space-y-2 mb-6">
+                <div class="flex justify-between">
+                    <span>Доход (на активную раздачу):</span>
+                    {% comment %}
+                        Предполагаем, что в контекст передаётся переменная ton_per_hour_per_user,
+                        и что в detail.html для TON-дерева рассчитывается индивидуально.
+                        Здесь просто выводим placeholder или ноль.
+                    {% endcomment %}
+                    <span class="font-medium">
+                        {{ tree.get_current_income }} TON/час
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Статус:</span>
+                    <span class="font-medium">
+                        {% if tree.is_watered %}
+                            <span class="status-indicator status-active"></span>Активно
+                        {% else %}
+                            <span class="status-indicator status-inactive"></span>Нужен полив
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Веток собрано:</span>
+                    <span class="font-medium">{{ tree.branches_collected }}</span>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <a href="{% url 'tree_detail' tree.id %}"
+                   class="bg-accent text-dark py-2 px-4 rounded-lg hover:bg-accent/80 transition">
+                    Управление
+                </a>
+            </div>
         </div>
         {% endfor %}
+
+        {# Если у пользователя вообще нет деревьев (этот блок увидит только новичок) #}
+        {% if cf_trees|length == 0 and ton_trees|length == 0 %}
+        <div class="card p-6 col-span-full text-center">
+            <p class="text-lg">У вас ещё нет деревьев. CF-дерево создаётся автоматически при первом входе.</p>
+        </div>
+        {% endif %}
     </div>
-    
+
+    {# --- Блок покупки TON-дерева (только если у пользователя нет TON-дерева) --- #}
+    {% if ton_trees|length == 0 %}
     <div class="mt-8 text-center">
-        <a href="{% url 'shop' %}" class="btn btn-accent">
-            Купить новое дерево
-        </a>
+        <form action="{% url 'shop:buy_ton_tree' %}" method="post" class="inline-block">
+            {% csrf_token %}
+            <button type="submit"
+                    class="bg-blue-500 text-white py-3 px-6 rounded-full font-semibold hover:bg-blue-600 transition">
+                Купить TON-дерево за 1 TON
+            </button>
+        </form>
     </div>
+    {% else %}
+    <div class="mt-8 text-center text-gray-300">
+        У вас уже есть TON-дерево. Перейдите в раздел P2P или управляйте существующим деревом.
+    </div>
+    {% endif %}
 </div>
-{% endblock %} 
+{% endblock %}

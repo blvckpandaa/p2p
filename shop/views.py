@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+
+from trees.models import Tree
+from trees.views import get_current_user
 from .models import ShopItem, Purchase
 from django.utils import timezone
 
@@ -28,16 +31,14 @@ def buy_item(request, item_id):
         return JsonResponse({'status': 'error', 'message': 'Недостаточно CF токенов'})
     elif item.price_token_type == 'TON' and user.ton_balance < item.price:
         return JsonResponse({'status': 'error', 'message': 'Недостаточно TON токенов'})
-    elif item.price_token_type == 'NOT' and user.not_balance < item.price:
-        return JsonResponse({'status': 'error', 'message': 'Недостаточно NOT токенов'})
+
     
     # Списываем средства
     if item.price_token_type == 'CF':
         user.cf_balance -= item.price
     elif item.price_token_type == 'TON':
         user.ton_balance -= item.price
-    elif item.price_token_type == 'NOT':
-        user.not_balance -= item.price
+
     
     user.save()
     
@@ -60,10 +61,10 @@ def buy_item(request, item_id):
         except Tree.DoesNotExist:
             pass
     
-    elif item.type in ['ton_tree', 'not_tree']:
+    elif item.type in ['ton_tree']:
         # Создаем новое дерево
         from trees.models import Tree
-        tree_type = 'TON' if item.type == 'ton_tree' else 'NOT'
+        tree_type = 'TON'
         
         # Проверяем, есть ли уже такое дерево
         existing_tree = Tree.objects.filter(user=user, type=tree_type).exists()
@@ -89,3 +90,26 @@ def buy_item(request, item_id):
         'message': f'Вы успешно приобрели {item.name}',
         'new_balance': getattr(user, f"{item.price_token_type.lower()}_balance")
     })
+
+def buy_ton_tree(request):
+    user = get_current_user(request)
+    if not user:
+        return redirect("telegram_login")
+
+    # Проверка, что у пользователя ещё нет TON-дерева
+    if Tree.objects.filter(user=user, type='TON').exists():
+        messages.warning(request, "У вас уже есть TON-дерево.")
+        return redirect("home")
+
+    cost_ton = 1  # допустим, 1 TON
+    if user.ton_balance < cost_ton:
+        messages.error(request, "Недостаточно TON для покупки TON-дерева.")
+        return redirect("home")
+
+    # Списываем TON и создаём дерево
+    user.ton_balance -= cost_ton
+    user.save(update_fields=["ton_balance"])
+    Tree.objects.create(user=user, type="TON")
+
+    messages.success(request, "TON-дерево успешно куплено!")
+    return redirect("home")

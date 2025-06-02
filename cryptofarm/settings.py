@@ -185,3 +185,7 @@ GAME_SETTINGS = {
     'ORDER_EXPIRY': 3,  # Ордера истекают через 3 дня
     'MIN_CF_FOR_STAKING': 300,  # Минимальное количество CF для стейкинга
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://ff5b-213-230-86-59.ngrok-free.app",
+]

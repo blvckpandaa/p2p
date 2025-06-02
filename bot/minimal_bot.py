@@ -39,7 +39,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Токен вашего бота (замените на реальный)
-TOKEN = "7920987349:AAGm0Ed0uefXGMQ-VC6KyqaQhUXRnvRQ02w"
+TOKEN = "8026375224:AAEi4Epjn6MviJMsUEjnsHnHfgGNZTucSYs"
 API_URL = f"https://api.telegram.org/bot{TOKEN}"
 
 # URL WebApp (ваш HTTPS‐домен, на котором запущен Django-проектор)
