@@ -37,6 +37,14 @@
         </div>
     </div>
     
+    <!-- График цены CF -->
+    <div class="card p-4 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Динамика цены CF</h2>
+        <div class="chart-container" style="position: relative; height:250px; width:100%">
+            <canvas id="cfPriceChart"></canvas>
+        </div>
+    </div>
+    
     <!-- Фильтры и сортировка -->
     <div class="filter-section mb-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -277,4 +285,89 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация графика цены CF
+    const ctx = document.getElementById('cfPriceChart').getContext('2d');
+    
+    // Используем JSON для безопасной передачи данных
+    const chartLabels = JSON.parse('{{ chart_data.labels|safe|escapejs }}');
+    const chartValues = JSON.parse('{{ chart_data.values|safe|escapejs }}');
+    
+    const cfPriceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Цена CF (₽)',
+                data: chartValues,
+                backgroundColor: 'rgba(90, 255, 117, 0.2)',
+                borderColor: 'rgba(90, 255, 117, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(90, 255, 117, 1)',
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(13, 31, 74, 0.8)',
+                    titleColor: 'rgba(255, 255, 255, 1)',
+                    bodyColor: 'rgba(255, 255, 255, 0.8)',
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `Цена: ${context.parsed.y} ₽`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %} 

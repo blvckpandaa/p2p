@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold mb-2">Мой профиль</h1>
+        <p class="text-lg">{{ user.get_full_name }}</p>
+        {% if user.username %}
+            <p class="text-sm text-gray-300">@{{ user.username }}</p>
+        {% endif %}
+    </div>
+
+    <div class="flex justify-center mb-8">
+        {% if photo_url %}
+            <img src="{{ photo_url }}" alt="{{ user.get_full_name }}" class="w-24 h-24 rounded-full border-2 border-white">
+        {% else %}
+            <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
+                {{ user.first_name|first }}{% if user.last_name %}{{ user.last_name|first }}{% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Ваш баланс</h2>
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center mr-3">
+                    <span class="font-bold">CF</span>
+                </div>
+                <div>
+                    <p class="font-semibold">CF Токены</p>
+                    <p class="text-sm text-gray-300">Основная игровая валюта</p>
+                </div>
+            </div>
+            <p class="text-xl font-bold">{{ cf_balance|floatformat:2 }}</p>
+        </div>
+        <div class="flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3">
+                    <span class="font-bold">TON</span>
+                </div>
+                <div>
+                    <p class="font-semibold">TON Токены</p>
+                    <p class="text-sm text-gray-300">Торговая валюта</p>
+                </div>
+            </div>
+            <p class="text-xl font-bold">{{ ton_balance|floatformat:8 }}</p>
+        </div>
+    </div>
+
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Ваши деревья</h2>
+        {% for tree in trees %}
+        <div class="flex justify-between items-center {% if not forloop.last %}mb-4 pb-4 border-b border-gray-700{% endif %}">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full 
+                    {% if tree.type == 'CF' %}bg-green-500
+                    {% elif tree.type == 'TON' %}bg-blue-500
+                    {% else %}bg-purple-500{% endif %} 
+                    flex items-center justify-center mr-3">
+                    <span class="font-bold">{{ tree.type }}</span>
+                </div>
+                <div>
+                    <p class="font-semibold">{{ tree.get_type_display }}</p>
+                    <p class="text-sm text-gray-300">Уровень {{ tree.level }}</p>
+                </div>
+            </div>
+            <p class="text-lg font-bold">{{ tree.income_per_hour|floatformat:2 }}/час</p>
+        </div>
+        {% empty %}
+        <p class="text-center text-gray-300">У вас пока нет деревьев</p>
+        {% endfor %}
+    </div>
+
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Реферальная программа</h2>
+        <p class="mb-1">Ваш реферальный код: <strong>{{ referral_code }}</strong></p>
+        <p class="mb-4">Пригласите друзей и получите бонусы!</p>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <div class="w-full md:w-1/2 bg-primary/30 p-4 rounded-lg text-center">
+                <div class="text-xs opacity-70 mb-1">Приглашено друзей</div>
+                <div class="font-semibold text-lg">{{ referral_count }}</div>
+            </div>
+            <div class="w-full md:w-1/2 bg-primary/30 p-4 rounded-lg text-center">
+                <div class="text-xs opacity-70 mb-1">Получено токенов</div>
+                <div class="font-semibold text-lg">{{ referral_rewards }} CF</div>
+            </div>
+        </div>
+        <button id="copy-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition w-full mb-4">
+            Поделиться реферальной ссылкой
+        </button>
+        <div class="bg-primary/20 p-3 rounded-lg text-center mt-2 text-sm break-all" id="ref-link">
+            https://t.me/p2pFloriya_bot?start={{ referral_code }}
+        </div>
+        {% if referrals_info %}
+            <h3 class="text-base font-semibold mt-6 mb-2">Ваши приглашённые:</h3>
+            <ul class="space-y-2">
+                {% for ref in referrals_info %}
+                    <li class="flex items-center justify-between bg-primary/10 p-2 rounded-lg">
+                        <div>
+                            <span class="font-semibold">@{{ ref.username }}</span>
+                            <span class="ml-2 text-xs opacity-70">{{ ref.first_name }} {{ ref.last_name }}</span>
+                        </div>
+                        <div class="text-xs text-right opacity-70">С: {{ ref.joined|date:"d.m.Y" }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="mt-2 text-sm text-center opacity-70">У вас пока нет рефералов</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtn = document.getElementById('copy-btn');
+        const refLink = document.getElementById('ref-link');
+        if (copyBtn && refLink) {
+            copyBtn.addEventListener('click', function() {
+                const tempInput = document.createElement('input');
+                tempInput.value = refLink.textContent.trim();
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Скопировано!';
+                copyBtn.classList.add('bg-accent', 'text-dark');
+                copyBtn.classList.remove('bg-secondary');
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('bg-accent', 'text-dark');
+                    copyBtn.classList.add('bg-secondary');
+                }, 2000);
+            });
+        }
+    });
+</script>
+{% endblock %}
