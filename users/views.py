@@ -1,28 +1,18 @@
 # users/views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import User
 from trees.models import Tree
 from referrals.models import Referral, ReferralBonus
 
 def telegram_login(request):
-    """
-    1) GET  /telegram_login/               → отдаём HTML с JS, который внутри WebApp
-                                           ждет initDataUnsafe.user.id и делает redirect на ?tg_id=…
-    2) GET  /telegram_login/?tg_id=123456  → Django создаёт/обновляет User(telegram_id=123456),
-                                           кладёт в session["telegram_id"], и делает redirect("home").
-    """
-
     tg_id = request.GET.get("tg_id")
-    # 1) Если отсутствует tg_id, показываем «заглушку» (telegram_login.html)
     if not tg_id:
         return render(request, "users/telegram_login.html")
 
-    # 2) Если же есть tg_id в GET – создаём или получаем соответствующего пользователя
     try:
         tg_id_int = int(tg_id)
     except ValueError:
-        # Некорректный ID – просто редиректим на главную
         return redirect("home")
 
     user, created = User.objects.get_or_create(
@@ -32,13 +22,15 @@ def telegram_login(request):
             "first_name": "",
             "last_name": "",
             "photo_url": "",
+            "cf_balance": 100.00,
+            "ton_balance": 0.00
         }
     )
 
     if created:
-        # Если новый пользователь – выдаём ему стартовое дерево
         Tree.objects.create(user=user, type="CF")
-        # И обрабатываем реферальный бонус, если был ref-параметр
+        user.cf_balance = 100
+        user.save()
         ref_code = request.GET.get("ref")
         if ref_code:
             try:
@@ -48,27 +40,66 @@ def telegram_login(request):
                 referrer = None
 
             if referrer and referrer != user:
-                user.referred_by = referrer
-                user.save()
+                # *** FAQAT BIR MARTA: user hali referral olmagan bo‘lsa ***
+                already_has_ref = Referral.objects.filter(invited=user).exists()
+                if not already_has_ref:
+                    user.referred_by = referrer
+                    user.save()
 
-                referral = Referral.objects.create(
-                    inviter=referrer,
-                    invited=user,
-                    bonus_cf=10
-                )
-                ReferralBonus.objects.create(
-                    referral=referral,
-                    bonus_type="signup",
-                    amount=10,
-                    description=f"Бонус за регистрацию {user}"
-                )
-                referrer.cf_balance += 10
-                referrer.save()
+                    referral = Referral.objects.create(
+                        inviter=referrer,
+                        invited=user,
+                        bonus_cf=10
+                    )
+                    ReferralBonus.objects.create(
+                        referral=referral,
+                        bonus_type="signup",
+                        amount=10,
+                        description=f"Бонус за регистрацию {user}"
+                    )
+                    referrer.cf_balance += 10
+                    referrer.save()
     else:
-        # Если пользователь уже существовал, но у него нет ни одного дерева – создаём старое
         if not Tree.objects.filter(user=user).exists():
             Tree.objects.create(user=user, type="CF")
 
-    # Кладём в сессию telegram_id и перекидываем на home
     request.session["telegram_id"] = tg_id_int
     return redirect("home")
+
+def profile_view(request):
+    telegram_id = request.session.get("telegram_id") or request.GET.get("telegram_id")
+    if not telegram_id:
+        return redirect('/telegram_login/')
+
+    user = get_object_or_404(User, telegram_id=telegram_id)
+
+    cf_balance = user.cf_balance
+    ton_balance = user.ton_balance
+    trees = user.trees.all() if hasattr(user, 'trees') else []
+    referral_code = user.referral_code
+    photo_url = user.photo_url
+
+    # Referal statistika va ro‘yxat
+    direct_referrals = Referral.objects.filter(inviter=user)
+    referral_count = direct_referrals.count()
+    bonuses = ReferralBonus.objects.filter(referral__inviter=user)
+    referral_rewards = sum(b.amount for b in bonuses)
+    referrals_info = [{
+        'username': r.invited.username,
+        'first_name': r.invited.first_name,
+        'last_name': r.invited.last_name,
+        'joined': r.date_joined,
+    } for r in direct_referrals]
+
+    context = {
+        "user": user,
+        "cf_balance": cf_balance,
+        "ton_balance": ton_balance,
+        "trees": trees,
+        "referral_code": referral_code,
+        "photo_url": photo_url,
+        "referral_count": referral_count,
+        "referral_rewards": referral_rewards,
+        "referrals_info": referrals_info,
+    }
+    return render(request, "users/profile.html", context)

@@ -60,6 +60,12 @@
                 Полить ({{ tree.water_cost }} CF)
             </button>
             
+            {% if is_watered %}
+            <button data-tree-id="{{ tree.id }}" class="collect-income-button bg-accent text-dark hover:bg-accent/80 transition text-center py-3 rounded-lg font-semibold">
+                Собрать {{ tree.income_per_hour }} {{ tree.crypto_type|upper }}
+            </button>
+            {% endif %}
+            
             <div class="tree-info bg-primary/20 p-3 rounded-lg text-center text-sm"></div>
         </div>
     </div>
@@ -222,6 +228,93 @@
                 bar.style.width = width;
             }, 300);
         });
+        
+        // Обработка полива дерева
+        const waterButton = document.querySelector('.water-button');
+        const treeInfo = document.querySelector('.tree-info');
+        
+        if (waterButton) {
+            waterButton.addEventListener('click', function() {
+                const treeId = this.dataset.treeId;
+                
+                fetch(`/tree/${treeId}/water/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        treeInfo.textContent = data.message;
+                        treeInfo.classList.add('success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        treeInfo.textContent = data.message;
+                        treeInfo.classList.add('error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    treeInfo.textContent = 'Произошла ошибка при поливе дерева';
+                    treeInfo.classList.add('error');
+                });
+            });
+        }
+        
+        // Обработка сбора дохода
+        const collectButton = document.querySelector('.collect-income-button');
+        
+        if (collectButton) {
+            collectButton.addEventListener('click', function() {
+                const treeId = this.dataset.treeId;
+                
+                fetch(`/tree/${treeId}/collect/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        treeInfo.textContent = data.message;
+                        treeInfo.classList.add('success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        treeInfo.textContent = data.message;
+                        treeInfo.classList.add('error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    treeInfo.textContent = 'Произошла ошибка при сборе дохода';
+                    treeInfo.classList.add('error');
+                });
+            });
+        }
+        
+        // Функция получения CSRF-токена из cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     });
 </script>
 {% endblock %} 

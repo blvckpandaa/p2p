@@ -89,3 +89,87 @@ def buy_item(request, item_id):
         'message': f'Вы успешно приобрели {item.name}',
         'new_balance': getattr(user, f"{item.price_token_type.lower()}_balance")
     })
+
+def buy_tree(request, tree_type):
+    """Покупка дерева определенного типа"""
+    if request.method != 'POST':
+        # Если метод GET, просто отображаем страницу подтверждения
+        context = {
+            'tree_type': tree_type,
+            'user': request.user
+        }
+        
+        # Если это не CF дерево, находим соответствующий товар
+        if tree_type.upper() in ['TON', 'NOT']:
+            item_type = f'{tree_type.lower()}_tree'
+            try:
+                item = ShopItem.objects.get(type=item_type, is_active=True)
+                context['item'] = item
+            except ShopItem.DoesNotExist:
+                pass
+        
+        return render(request, 'shop/buy_tree.html', context)
+    
+    # Если метод POST - выполняем покупку
+    user = request.user
+    
+    # Определяем тип дерева и ищем соответствующий товар
+    if tree_type.upper() == 'CF':
+        # CF дерево выдается бесплатно
+        from trees.models import Tree
+        if not Tree.objects.filter(user=user, type='CF').exists():
+            Tree.objects.create(user=user, type='CF')
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Вы получили дерево CF',
+        })
+    
+    elif tree_type.upper() in ['TON', 'NOT']:
+        # Находим товар соответствующего типа
+        item_type = f'{tree_type.lower()}_tree'
+        try:
+            item = ShopItem.objects.get(type=item_type, is_active=True)
+        except ShopItem.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': f'Товар типа {tree_type} не найден'})
+        
+        # Проверяем, есть ли уже такое дерево
+        from trees.models import Tree
+        if Tree.objects.filter(user=user, type=tree_type.upper()).exists():
+            return JsonResponse({'status': 'error', 'message': f'У вас уже есть дерево {tree_type.upper()}'})
+        
+        # Проверяем достаточно ли средств
+        if item.price_token_type == 'CF' and user.cf_balance < item.price:
+            return JsonResponse({'status': 'error', 'message': 'Недостаточно CF токенов'})
+        elif item.price_token_type == 'TON' and user.ton_balance < item.price:
+            return JsonResponse({'status': 'error', 'message': 'Недостаточно TON токенов'})
+        elif item.price_token_type == 'NOT' and user.not_balance < item.price:
+            return JsonResponse({'status': 'error', 'message': 'Недостаточно NOT токенов'})
+        
+        # Списываем средства
+        if item.price_token_type == 'CF':
+            user.cf_balance -= item.price
+        elif item.price_token_type == 'TON':
+            user.ton_balance -= item.price
+        elif item.price_token_type == 'NOT':
+            user.not_balance -= item.price
+        
+        user.save()
+        
+        # Создаем дерево
+        Tree.objects.create(user=user, type=tree_type.upper())
+        
+        # Записываем покупку
+        Purchase.objects.create(
+            user=user,
+            item=item,
+            price_paid=item.price
+        )
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Вы успешно приобрели дерево {tree_type.upper()}',
+            'new_balance': getattr(user, f"{item.price_token_type.lower()}_balance")
+        })
+    
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Неизвестный тип дерева'})

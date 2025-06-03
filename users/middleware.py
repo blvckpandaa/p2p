@@ -30,7 +30,9 @@ class TelegramAuthMiddleware:
                     telegram_id=test_id,
                     username="test_user",
                     first_name="Test",
-                    last_name="User"
+                    last_name="User",
+                    cf_balance=100.00,  # Добавляем начальный баланс CF
+                    ton_balance=1.00    # Добавляем начальный баланс TON
                 )
                 test_user.save()
                 from trees.models import Tree

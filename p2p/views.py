@@ -8,6 +8,8 @@ from django.db import transaction
 from django.db import models
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.urls import reverse
+import datetime
+import json
 
 def p2p_market(request):
     """Страница P2P-биржи"""
@@ -70,13 +72,32 @@ def p2p_market(request):
         # Если page больше, чем общее количество страниц, выдаем последнюю
         transactions = paginator.page(paginator.num_pages)
     
+    # Генерируем данные для графика цены CF (для демонстрации)
+    chart_labels = []
+    chart_values = []
+    
+    # Получаем последние 7 дней
+    today = datetime.date.today()
+    for i in range(7, 0, -1):
+        day = today - datetime.timedelta(days=i-1)
+        chart_labels.append(day.strftime('%d.%m'))
+        # Простая модель: базовая цена + день (ежедневный рост на 1 CF)
+        base_price = 100  # Базовая цена CF
+        chart_values.append(base_price + i)
+    
+    chart_data = {
+        'labels': json.dumps(chart_labels),
+        'values': json.dumps(chart_values)
+    }
+    
     return render(request, 'p2p/index.html', {
         'action': action,
         'crypto': crypto.lower(),
         'orders': orders,
         'my_deals': my_deals,
         'transactions': transactions,
-        'user': request.user
+        'user': request.user,
+        'chart_data': chart_data
     })
 
 def create_order(request):
