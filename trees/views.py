@@ -1,12 +1,16 @@
 # trees/views.py
 
 from decimal import Decimal
+
+from django.db.models import Sum
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Tree, TonDistribution
-from users.models import User as TelegramUser
+from users.models import User as TelegramUser, User
+
 
 # Если у вас в проекте есть модель для логов, раскомментируйте импорт и используйте её.
 # from .models import TreeLog
@@ -93,6 +97,11 @@ def tree_detail(request, tree_id):
     is_fertilized = tree.is_fertilized()
     # Проверяем, можно ли апгрейдить (достаточно ли веток)
     can_upgrade = tree.can_upgrade()
+    TOTAL_CREATED_CF = 25_000_000
+    all_cf_grown = User.objects.aggregate(total=Sum('cf_balance'))['total'] or 0
+
+    user_cf_grown = user.cf_balance if user else 0
+
 
     # Базовый контекст
     context = {
@@ -103,6 +112,9 @@ def tree_detail(request, tree_id):
         "can_upgrade": can_upgrade,
         "water_percent": tree.get_water_percent(),  # <--- новый %
         "pending_income": float(tree.get_pending_income()),
+        'total_created_cf': TOTAL_CREATED_CF,
+        'all_cf_grown': all_cf_grown,
+        "user_cf_grown": user_cf_grown,
     }
 
     # --- Логи дерева ---
@@ -192,4 +204,45 @@ def upgrade_tree(request, tree_id):
         "message": f"Дерево улучшено до уровня {tree.level}",
         "new_level": tree.level,
         "new_income": float(tree.income_per_hour)
+    })
+
+
+@csrf_exempt  # или используй @login_required
+def collect_income(request, tree_id):
+    user = get_current_user(request)
+    if not user:
+        return JsonResponse({"status": "error", "message": "Сначала авторизуйтесь"}, status=403)
+    tree = get_object_or_404(Tree, id=tree_id, user=user)
+    if request.method != 'POST':
+        return JsonResponse({"status": "error", "message": "Требуется POST"}, status=400)
+
+    # Логика: считаем накопленный доход и зачисляем на баланс
+    now = timezone.now()
+    if tree.last_watered:
+        seconds_since = (now - tree.last_watered).total_seconds()
+        hours = min(seconds_since / 3600, 5)
+    else:
+        hours = 0
+
+    if hours <= 0:
+        return JsonResponse({"status": "error", "message": "Нет накопленного дохода"}, status=400)
+
+    # CF-дерево
+    if tree.type == 'CF':
+        pending = (tree.income_per_hour * Decimal(hours)).quantize(Decimal('0.0000'))
+        user.cf_balance += pending
+        user.save(update_fields=["cf_balance"])
+    # TON-дерево (если хочешь реализовать)
+    elif tree.type == 'TON':
+        # ... логику TON смотри по своему проекту
+        pending = Decimal('0')  # ТУТ добавь свою формулу
+
+    # Обнуляем last_watered чтобы нельзя было собрать повторно
+    tree.last_watered = now
+    tree.save(update_fields=["last_watered"])
+
+    return JsonResponse({
+        "status": "success",
+        "collected": float(pending),
+        "new_balance_cf": float(user.cf_balance),
     })

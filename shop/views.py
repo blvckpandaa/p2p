@@ -93,3 +93,5 @@ def buy_ton_tree(request):
 
     messages.success(request, "TON-дерево успешно куплено!")
     return redirect("home")
+
+

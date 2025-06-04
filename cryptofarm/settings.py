@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     # Сторонние приложения
     'django_extensions',  # Полезные инструменты разработки
     'rest_framework',    # REST API
+    'django.contrib.humanize',
+
 
     # Приложения проекта
     'users',

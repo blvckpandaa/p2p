@@ -20,7 +20,19 @@
       {% endif %}
     </h1>
   </div>
+{% load humanize %}
 
+<div class="mt-6 flex flex-col items-center space-y-2">
+    <div class="bg-blue-400/20 rounded-lg px-6 py-2 font-semibold text-base">
+        Создано CF: {{ total_created_cf|intcomma }}
+    </div>
+    <div class="bg-blue-400/20 rounded-lg px-6 py-2 font-semibold text-base">
+        Выращено: {{ all_cf_grown|floatformat:0|intcomma }}
+    </div>
+    <div class="bg-blue-400/20 rounded-lg px-6 py-2 font-semibold text-base">
+        Выращено: {{ user_cf_grown|floatformat:0|intcomma }} CF
+    </div>
+</div>
   <!-- Основная карточка с информацией о дереве -->
   <div class="card p-4 mb-6 bg-primary/30 text-white">
 
@@ -72,10 +84,19 @@
     </div>
 
     <!-- Новый блок: Накопленный доход -->
-    <div class="flex justify-between mb-2 text-white">
-      <span>Можно собрать:</span>
-      <span id="pending-income">{{ pending_income }} CF</span>
-    </div>
+    <div class="flex justify-between mb-2 text-white items-center">
+  <span>Можно собрать:</span>
+  <span>
+    <span id="pending-income">{{ pending_income }} CF</span>
+    <button
+      id="collect-income-btn"
+      data-tree-id="{{ tree.id }}"
+      class="ml-2 px-3 py-1 bg-accent text-dark rounded hover:bg-accent/80 font-semibold text-sm"
+      {% if pending_income|floatformat:4 == '0.0000' %}disabled{% endif %}
+    >Собрать</button>
+  </span>
+</div>
+<div id="collect-income-result" class="tree-info bg-primary/20 p-2 rounded-lg text-center text-xs text-white mb-1"></div>
 
     <!-- Новый блок: Прогресс-бар воды -->
     <div class="mb-4">
@@ -229,6 +250,8 @@
       });
     }
 
+
+
     // AJAX для апгрейда дерева
     const upgradeButton = document.getElementById('upgrade-button');
     if (upgradeButton) {
@@ -266,6 +289,51 @@
         });
       });
     }
+    // Сбор накопленного дохода (AJAX)
+const collectBtn = document.getElementById('collect-income-btn');
+if (collectBtn) {
+  collectBtn.addEventListener('click', function() {
+    const treeId = this.getAttribute('data-tree-id');
+    this.disabled = true;
+    const resultDiv = document.getElementById('collect-income-result');
+    resultDiv.textContent = 'Собираем...';
+
+    fetch(`/tree/${treeId}/collect_income/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        // Обновить баланс пользователя (если показывается)
+        if (data.new_balance_cf !== undefined) {
+          // Обнови поле баланса где-нибудь в шапке, если оно там есть!
+          // document.getElementById('user-cf-balance').textContent = data.new_balance_cf + ' CF';
+        }
+        // Обновить счетчик дохода
+        document.getElementById('pending-income').textContent = '0.0000 CF';
+        resultDiv.textContent = 'Доход успешно собран!';
+        // Можешь location.reload(), если хочешь всё обновить
+      } else {
+        resultDiv.textContent = 'Ошибка: ' + (data.message || data.error);
+        collectBtn.disabled = false;
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      resultDiv.textContent = 'Ошибка соединения.';
+      collectBtn.disabled = false;
+    });
   });
+}
+
+  });
+
 </script>
 {% endblock %}
