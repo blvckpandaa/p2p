@@ -124,21 +124,6 @@
         {% endif %}
     </div>
 
-    {# --- Блок покупки TON-дерева (только если у пользователя нет TON-дерева) --- #}
-    {% if ton_trees|length == 0 %}
-    <div class="mt-8 text-center">
-        <form action="{% url 'shop:buy_ton_tree' %}" method="post" class="inline-block">
-            {% csrf_token %}
-            <button type="submit"
-                    class="bg-blue-500 text-white py-3 px-6 rounded-full font-semibold hover:bg-blue-600 transition">
-                Купить TON-дерево за 1 TON
-            </button>
-        </form>
-    </div>
-    {% else %}
-    <div class="mt-8 text-center text-gray-300">
-        У вас уже есть TON-дерево. Перейдите в раздел P2P или управляйте существующим деревом.
-    </div>
-    {% endif %}
+
 </div>
 {% endblock %}

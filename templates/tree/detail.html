@@ -22,19 +22,21 @@
   </div>
 {% load humanize %}
 
+<!-- Суммы сверху -->
 <div class="mt-6 flex flex-col items-center space-y-2">
     <div class="bg-blue-400/20 rounded-lg px-6 py-2 font-semibold text-base">
-        Создано CF: {{ total_created_cf|intcomma }}
+        Создано CF: <span id="created-cf">{{ total_created_cf|intcomma }}</span>
     </div>
     <div class="bg-blue-400/20 rounded-lg px-6 py-2 font-semibold text-base">
-        Выращено: {{ all_cf_grown|floatformat:0|intcomma }}
+        Выращено: <span id="all-cf-grown">{{ all_cf_grown|floatformat:0|intcomma }}</span>
     </div>
     <div class="bg-blue-400/20 rounded-lg px-6 py-2 font-semibold text-base">
-        Выращено: {{ user_cf_grown|floatformat:0|intcomma }} CF
+        Выращено: <span id="user-cf-grown">{{ user_cf_grown|floatformat:0|intcomma }}</span> CF
     </div>
 </div>
-  <!-- Основная карточка с информацией о дереве -->
-  <div class="card p-4 mb-6 bg-primary/30 text-white">
+
+<!-- Основная карточка -->
+<div class="card p-4 mb-6 bg-primary/30 text-white">
 
     <!-- Визуальное представление -->
     <div class="tree-container mb-4">
@@ -55,7 +57,6 @@
         <div class="text-xs opacity-70">Доход в час:</div>
         <div class="font-semibold" id="tree-income">{{ tree.income_per_hour }} {{ tree.type }}/час</div>
       </div>
-
       {% if tree.type == 'CF' %}
       <div class="bg-primary/20 p-3 rounded-lg">
         <div class="text-xs opacity-70">Веток собрано:</div>
@@ -70,10 +71,9 @@
         </div>
       </div>
       {% endif %}
-
       <div class="bg-primary/20 p-3 rounded-lg">
         <div class="text-xs opacity-70">Последний полив:</div>
-        <div class="font-semibold">
+        <div class="font-semibold tree-last-watered" id="tree-last-watered">
           {% if tree.last_watered %}
             {{ tree.last_watered|date:"d.m.Y H:i" }}
           {% else %}
@@ -83,22 +83,22 @@
       </div>
     </div>
 
-    <!-- Новый блок: Накопленный доход -->
+    <!-- Накопленный доход -->
     <div class="flex justify-between mb-2 text-white items-center">
-  <span>Можно собрать:</span>
-  <span>
-    <span id="pending-income">{{ pending_income }} CF</span>
-    <button
-      id="collect-income-btn"
-      data-tree-id="{{ tree.id }}"
-      class="ml-2 px-3 py-1 bg-accent text-dark rounded hover:bg-accent/80 font-semibold text-sm"
-      {% if pending_income|floatformat:4 == '0.0000' %}disabled{% endif %}
-    >Собрать</button>
-  </span>
-</div>
-<div id="collect-income-result" class="tree-info bg-primary/20 p-2 rounded-lg text-center text-xs text-white mb-1"></div>
+      <span>Можно собрать:</span>
+      <span>
+        <span id="pending-income">{{ pending_income }} CF</span>
+        <button
+          id="collect-income-btn"
+          data-tree-id="{{ tree.id }}"
+          class="ml-2 px-3 py-1 bg-accent text-dark rounded hover:bg-accent/80 font-semibold text-sm"
+          {% if pending_income|floatformat:4 == '0.0000' %}disabled{% endif %}
+        >Собрать</button>
+      </span>
+    </div>
+    <div id="collect-income-result" class="tree-info bg-primary/20 p-2 rounded-lg text-center text-xs text-white mb-1"></div>
 
-    <!-- Новый блок: Прогресс-бар воды -->
+    <!-- Прогресс-бар воды -->
     <div class="mb-4">
       <div class="flex justify-between text-xs text-white mb-1">
         <span>Вода</span>
@@ -122,6 +122,58 @@
       <div id="water-result" class="tree-info bg-primary/20 p-3 rounded-lg text-center text-sm text-white"></div>
     </div>
   </div>
+<h3>Купленные предметы:</h3>
+
+<ul>
+  {# Активные эффекты #}
+  {% if tree.auto_water_until and tree.auto_water_until > now %}
+    <li class="bg-green-200 text-green-900 rounded px-3 py-1 mb-1">
+      <b>Автополив</b> (ещё {{ tree.auto_water_until|timeuntil }})
+    </li>
+  {% endif %}
+  {% if tree.fertilized_until and tree.fertilized_until > now %}
+    <li class="bg-green-200 text-green-900 rounded px-3 py-1 mb-1">
+      <b>Удобрение</b> (доход ×2, ещё {{ tree.fertilized_until|timeuntil }})
+    </li>
+  {% endif %}
+
+  {# Список купленных, но ещё не использованных предметов #}
+  {% for purchase in user.purchases.all %}
+    {% if purchase.item.type == 'fertilizer' or purchase.item.type == 'auto_water' %}
+      <li class="mb-1">
+        {{ purchase.item.get_type_display }}
+        {% if purchase.item.duration %}
+          ({{ purchase.item.duration }} ч.)
+        {% endif %}
+        <form method="post" action="{% url 'shop:use_shop_item' purchase.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit"
+            class="px-3 py-1 rounded bg-blue-500 text-white"
+            {% if purchase.item.type == 'fertilizer' and fertilizer_active or purchase.item.type == 'auto_water' and auto_water_active %}
+  disabled
+{% endif %}
+
+          >Использовать</button>
+        </form>
+      </li>
+    {% endif %}
+  {% empty %}
+    <li>Нет предметов для использования.</li>
+  {% endfor %}
+</ul>
+
+
+
+{# Если и активных эффектов нет, и предметов нет — переход в магазин #}
+{% if not auto_water_active and not fertilizer_active and not user.purchases.all %}
+  <div class="mt-3">
+    <a href="{% url 'shop:shop' %}" class="inline-block px-6 py-2 bg-accent text-white rounded font-semibold">
+      Перейти в магазин
+    </a>
+  </div>
+{% endif %}
+
+
 
   {# --- Блок «Повышение уровня» (только CF, если level < 5) --- #}
   {% if tree.type == 'CF' and tree.level < 5 %}
@@ -157,7 +209,6 @@
         </div>
       </div>
     </div>
-
     <div class="grid grid-cols-1 gap-2">
       {% if can_upgrade %}
       <button
@@ -180,160 +231,165 @@
   </div>
   {% endif %}
 
-  {# Остальные блоки (автополив, удобрение, история, TON) добавляй аналогично #}
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Прогресс-бар анимация
-    const bar = document.getElementById('water-bar');
-    if (bar) {
-      const w = bar.style.width;
-      bar.style.width = '0';
-      setTimeout(() => {
-        bar.style.transition = 'width 1s ease-in-out';
-        bar.style.width = w;
-      }, 100);
-    }
+document.addEventListener('DOMContentLoaded', function() {
+  // Прогресс-бар анимация
+  const bar = document.getElementById('water-bar');
+  if (bar) {
+    const w = bar.style.width;
+    bar.style.width = '0';
+    setTimeout(() => {
+      bar.style.transition = 'width 1s ease-in-out';
+      bar.style.width = w;
+    }, 100);
+  }
 
-    // AJAX для полива дерева
-    const cfButton = document.getElementById('water-button');
-    if (cfButton) {
-      cfButton.addEventListener('click', function() {
-        const treeId = this.getAttribute('data-tree-id');
-        this.disabled = true;
-        const resultDiv = document.getElementById('water-result');
-        resultDiv.textContent = 'Отправляем запрос…';
+  // --- AJAX для полива ---
+  const cfButton = document.getElementById('water-button');
+  if (cfButton) {
+    cfButton.addEventListener('click', function() {
+      const treeId = this.getAttribute('data-tree-id');
+      this.disabled = true;
+      const resultDiv = document.getElementById('water-result');
+      resultDiv.textContent = 'Отправляем запрос…';
 
-        fetch(`/tree/${treeId}/water/`, {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          credentials: 'same-origin',
-          body: JSON.stringify({})
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === 'success') {
-            let msg = 'Успешно полито.';
-            if (data.branch_dropped) {
-              msg += ' Ветка найдена!';
-            }
-            if (data.amount_cf) {
-              msg += ` +${data.amount_cf.toFixed(2)} CF.`;
-            }
-            // Обновляем воду
-            if (typeof data.water_percent !== 'undefined') {
-              document.getElementById('water-percent').textContent = data.water_percent + '%';
-              document.getElementById('water-bar').style.width = data.water_percent + '%';
-            }
-            // Обновляем доход
-            if (typeof data.pending_income !== 'undefined') {
-              document.getElementById('pending-income').textContent = data.pending_income + ' CF';
-            }
-            resultDiv.textContent = msg;
-          } else {
-            resultDiv.textContent = 'Ошибка: ' + (data.message || data.error);
-            cfButton.disabled = false;
+      fetch(`/tree/${treeId}/water/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          let msg = 'Успешно полито.';
+          // Если ветка выпала — сразу обновить ветки
+          if (typeof data.branches_collected !== 'undefined') {
+            document.getElementById('tree-branches').textContent =
+              data.branches_collected + ' / ' +
+              document.getElementById('tree-branches').textContent.split('/')[1].trim();
+            msg += data.branch_dropped ? ' Ветка найдена!' : '';
           }
-        })
-        .catch(err => {
-          console.error(err);
-          resultDiv.textContent = 'Ошибка соединения.';
+          if (typeof data.amount_cf !== 'undefined') {
+            msg += ` +${parseFloat(data.amount_cf).toFixed(2)} CF.`;
+          }
+          // Обновить последний полив
+          if (data.last_watered) {
+            document.getElementById('tree-last-watered').textContent = data.last_watered;
+          }
+          // Обновить доход "Можно собрать"
+          if (typeof data.pending_income !== 'undefined') {
+            document.getElementById('pending-income').textContent = parseFloat(data.pending_income).toFixed(4) + ' CF';
+            // и разблокировать кнопку "Собрать" если доход снова > 0
+            if (parseFloat(data.pending_income) > 0) {
+              document.getElementById('collect-income-btn').disabled = false;
+            }
+          }
+          // Обновить воду
+          if (typeof data.water_percent !== 'undefined') {
+            document.getElementById('water-percent').textContent = data.water_percent + '%';
+            document.getElementById('water-bar').style.width = data.water_percent + '%';
+          }
+          resultDiv.textContent = msg;
+        } else {
+          resultDiv.textContent = 'Ошибка: ' + (data.message || data.error);
           cfButton.disabled = false;
-        });
-      });
-    }
-
-
-
-    // AJAX для апгрейда дерева
-    const upgradeButton = document.getElementById('upgrade-button');
-    if (upgradeButton) {
-      upgradeButton.addEventListener('click', function() {
-        const treeId = this.getAttribute('data-tree-id');
-        this.disabled = true;
-        const resultDiv = document.getElementById('upgrade-result');
-        resultDiv.textContent = 'Обновление...';
-
-        fetch(`/tree/${treeId}/upgrade/`, {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          credentials: 'same-origin',
-          body: JSON.stringify({})
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === 'success') {
-            resultDiv.textContent = data.message;
-            // Самый надёжный способ — просто перезагрузить страницу:
-            location.reload();
-          } else {
-            resultDiv.textContent = 'Ошибка: ' + (data.message || data.error);
-            upgradeButton.disabled = false;
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          resultDiv.textContent = 'Ошибка соединения.';
-          upgradeButton.disabled = false;
-        });
-      });
-    }
-    // Сбор накопленного дохода (AJAX)
-const collectBtn = document.getElementById('collect-income-btn');
-if (collectBtn) {
-  collectBtn.addEventListener('click', function() {
-    const treeId = this.getAttribute('data-tree-id');
-    this.disabled = true;
-    const resultDiv = document.getElementById('collect-income-result');
-    resultDiv.textContent = 'Собираем...';
-
-    fetch(`/tree/${treeId}/collect_income/`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': '{{ csrf_token }}',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify({})
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'success') {
-        // Обновить баланс пользователя (если показывается)
-        if (data.new_balance_cf !== undefined) {
-          // Обнови поле баланса где-нибудь в шапке, если оно там есть!
-          // document.getElementById('user-cf-balance').textContent = data.new_balance_cf + ' CF';
         }
-        // Обновить счетчик дохода
-        document.getElementById('pending-income').textContent = '0.0000 CF';
-        resultDiv.textContent = 'Доход успешно собран!';
-        // Можешь location.reload(), если хочешь всё обновить
-      } else {
-        resultDiv.textContent = 'Ошибка: ' + (data.message || data.error);
-        collectBtn.disabled = false;
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      resultDiv.textContent = 'Ошибка соединения.';
-      collectBtn.disabled = false;
+      })
+      .catch(err => {
+        console.error(err);
+        resultDiv.textContent = 'Ошибка соединения.';
+        cfButton.disabled = false;
+      });
     });
-  });
-}
+  }
 
-  });
+  // --- AJAX для апгрейда дерева ---
+  const upgradeButton = document.getElementById('upgrade-button');
+  if (upgradeButton) {
+    upgradeButton.addEventListener('click', function() {
+      const treeId = this.getAttribute('data-tree-id');
+      this.disabled = true;
+      const resultDiv = document.getElementById('upgrade-result');
+      resultDiv.textContent = 'Обновление...';
 
+      fetch(`/tree/${treeId}/upgrade/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          resultDiv.textContent = data.message;
+          location.reload(); // на апгрейд пока проще перезагрузить
+        } else {
+          resultDiv.textContent = 'Ошибка: ' + (data.message || data.error);
+          upgradeButton.disabled = false;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        resultDiv.textContent = 'Ошибка соединения.';
+        upgradeButton.disabled = false;
+      });
+    });
+  }
+
+  // --- Сбор дохода (AJAX) ---
+  const collectBtn = document.getElementById('collect-income-btn');
+  if (collectBtn) {
+    collectBtn.addEventListener('click', function() {
+      const treeId = this.getAttribute('data-tree-id');
+      this.disabled = true;
+      const resultDiv = document.getElementById('collect-income-result');
+      resultDiv.textContent = 'Собираем...';
+
+      fetch(`/tree/${treeId}/collect_income/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          // Обновить баланс пользователя (если есть блок)
+          if (data.new_balance_cf !== undefined) {
+            // document.getElementById('user-cf-balance').textContent = data.new_balance_cf + ' CF';
+          }
+          // Обновить счетчик дохода
+          document.getElementById('pending-income').textContent = '0.0000 CF';
+          resultDiv.textContent = 'Доход успешно собран!';
+        } else {
+          resultDiv.textContent = 'Ошибка: ' + (data.message || data.error);
+          collectBtn.disabled = false;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        resultDiv.textContent = 'Ошибка соединения.';
+        collectBtn.disabled = false;
+      });
+    });
+  }
+});
 </script>
 {% endblock %}

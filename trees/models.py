@@ -12,7 +12,7 @@ class Tree(models.Model):
     )
 
     user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="trees")
-    type = models.CharField(max_length=3, choices=TYPE_CHOICES, default='CF')
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='CF')
     level = models.PositiveSmallIntegerField(default=1)
     income_per_hour = models.DecimalField(max_digits=10, decimal_places=4, default=Decimal('1.0'))
     branches_collected = models.PositiveIntegerField(default=0)
@@ -20,15 +20,20 @@ class Tree(models.Model):
     last_watered = models.DateTimeField(null=True, blank=True)
     fertilized_until = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    auto_water_until = models.DateTimeField(null=True, blank=True)
 
-    BRANCH_DROP_CHANCE = 0.10  # 10% шанс получить ветку
-    WATER_DURATION = 5  # Сколько часов длится "полив" (100% воды)
+    BRANCH_DROP_CHANCE = 0.5
+    WATER_DURATION = 5
 
     def is_watered(self):
-        """Проверяем, не истёк ли период полива (5 часов)."""
+        now = timezone.now()
+
+        if self.auto_water_until and now < self.auto_water_until:
+            return True
+
         if not self.last_watered:
             return False
-        now = timezone.now()
+
         expiry = self.last_watered + timezone.timedelta(hours=self.WATER_DURATION)
         return now < expiry
 
@@ -64,6 +69,12 @@ class Tree(models.Model):
         self.save(update_fields=["level", "branches_collected", "income_per_hour"])
         return True
 
+    def get_income_per_hour(self):
+        now = timezone.now()
+        if self.fertilized_until and now < self.fertilized_until:
+            return self.income_per_hour * 2
+        return self.income_per_hour
+
     def get_pending_income(self):
         """
         Считает, сколько CF/TON накопилось с прошлого полива (но не больше, чем за WATER_DURATION часов).
@@ -88,25 +99,33 @@ class Tree(models.Model):
         percent = max(0, 100 - int((hours_passed / self.WATER_DURATION) * 100))
         return percent
 
+    def apply_shop_item(self, shop_item):
+        now = timezone.now()
+        if shop_item.type == 'fertilizer':
+            hours = shop_item.duration or 24
+            self.fertilized_until = now + timezone.timedelta(hours=hours)
+            self.save(update_fields=["fertilized_until"])
+            return "Дерево удобрено (доход х2)!"
+        elif shop_item.type == 'auto_water':
+            hours = shop_item.duration or 24
+            self.auto_water_until = now + timezone.timedelta(hours=hours)
+            self.save(update_fields=["auto_water_until"])
+            return "Автополив активен!"
+
+        return "Неизвестный предмет"
+
     def water(self):
-        """
-        Полив дерева:
-          1. Начисляем накопленный доход (CF или TON) только за реально прошедшее время с последнего полива.
-          2. Обновляем last_watered = now и сбрасываем "воду" на 100%.
-          3. Генерируем ветку с вероятностью BRANCH_DROP_CHANCE.
-        Возвращает словарь:
-          {"branch_dropped": bool, "amount_cf": Decimal, "amount_ton": Decimal}
-        """
         now = timezone.now()
         amount_cf = Decimal('0')
         amount_ton = Decimal('0')
+        user = self.user
 
         if self.type == "CF":
             amount_cf = self.get_pending_income()
-            user = self.user
             if amount_cf > 0:
                 user.cf_balance += amount_cf
                 user.save(update_fields=["cf_balance"])
+
         elif self.type == "TON":
             from .models import TonDistribution
             active_qs = TonDistribution.objects.filter(is_active=True)
@@ -116,33 +135,32 @@ class Tree(models.Model):
                 if participants_count > 0:
                     total_per_user = (dist.total_amount / Decimal(participants_count))
                     ton_per_hour = (total_per_user / Decimal(dist.duration_hours)).quantize(Decimal('0.00000001'))
-                    # Только за реально прошедшее время, не более WATER_DURATION часов
-                    now = timezone.now()
                     if not self.last_watered:
                         hours_passed = 0
                     else:
                         hours_passed = min((now - self.last_watered).total_seconds() / 3600, self.WATER_DURATION)
                     amount_ton = (ton_per_hour * Decimal(hours_passed)).quantize(Decimal('0.00000001'))
-                    user = self.user
                     if amount_ton > 0:
                         user.ton_balance += amount_ton
                         user.save(update_fields=["ton_balance"])
 
-        # Ветка с вероятностью
         branch_dropped = False
-        if random.random() < self.BRANCH_DROP_CHANCE:
+        if self.type == "CF" and random.random() < self.BRANCH_DROP_CHANCE:
             branch_dropped = True
             self.branches_collected += 1
             self.save(update_fields=["branches_collected"])
 
-        # Сохраняем время последнего полива
         self.last_watered = now
         self.save(update_fields=["last_watered"])
 
         return {
             "branch_dropped": branch_dropped,
-            "amount_cf": amount_cf,
-            "amount_ton": amount_ton
+            "amount_cf": float(amount_cf),
+            "amount_ton": float(amount_ton),
+            "branches_collected": self.branches_collected,
+            "last_watered": now.strftime("%d.%m.%Y %H:%M"),
+            "pending_income": float(self.get_pending_income()),
+            "water_percent": self.get_water_percent(),
         }
 
 

@@ -1,7 +1,11 @@
 # users/views.py
-
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import User
+from django.utils.crypto import get_random_string
+
+from cryptofarm import settings
+from trees.views import get_current_user
+from .models import User, TonDepositRequest
 from trees.models import Tree
 from referrals.models import Referral, ReferralBonus
 
@@ -103,3 +107,40 @@ def profile_view(request):
         "referrals_info": referrals_info,
     }
     return render(request, "users/profile.html", context)
+
+def deposit_ton(request):
+    user = get_current_user(request)  # или request.user
+    if not user:
+        messages.error(request, "Сначала авторизуйтесь!")
+        return redirect("telegram_login")
+
+    if request.method == "POST":
+        try:
+            amount = float(request.POST.get("amount", 0))
+        except (TypeError, ValueError):
+            messages.error(request, "Некорректная сумма")
+            return redirect("profile")
+
+        if amount <= 0:
+            messages.error(request, "Сумма должна быть больше 0")
+            return redirect("profile")
+
+
+        memo = f"p2p_{user.telegram_id}_{get_random_string(6)}_{amount:.4f}"
+        ton_wallet_address = settings.PROJECT_TON_WALLET  # пропиши свой адрес
+        deeplink = f"https://t.me/wallet?startapp=ton_transfer_{ton_wallet_address}_{amount}"
+
+        TonDepositRequest.objects.create(
+            user=user,
+            amount=amount,
+            memo=memo,
+        )
+
+        messages.info(request,
+            f"Переведите <b>{amount} TON</b> на адрес <code>{ton_wallet_address}</code> "
+            f"с комментарием <b>{memo}</b>.<br>"
+            f"Это важно — иначе пополнение не зачтётся.<br>"
+            f"<a href='{deeplink}' target='_blank'>Открыть Telegram Wallet</a>"
+        )
+        return redirect("profile")
+    return redirect("profile")

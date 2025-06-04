@@ -3,6 +3,14 @@
 {% block title %}Мой профиль{% endblock %}
 
 {% block content %}
+    {% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li class="mb-2 p-2 rounded bg-green-200 text-green-800">{{ message|safe }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 <div class="container mx-auto px-4 py-8">
     <div class="text-center mb-6">
         <h1 class="text-2xl font-bold mb-2">Мой профиль</h1>
@@ -49,6 +57,22 @@
             <p class="text-xl font-bold">{{ ton_balance|floatformat:8 }}</p>
         </div>
     </div>
+<form action="{% url 'deposit_ton' %}" method="post" class="flex items-center gap-2">
+    {% csrf_token %}
+    <input
+        type="number"
+        name="amount"
+        min="1"
+        step="any"
+        placeholder="Сумма TON"
+        required
+        class="w-32 px-3 py-2 rounded border text-gray-900"
+    >
+    <button type="submit" class="bg-blue-600 text-white rounded px-4 py-2 font-semibold">
+        Пополнить TON
+    </button>
+</form>
+
 
     <div class="card p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4">Ваши деревья</h2>

@@ -149,6 +149,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', 'YOUR_BOT_TOKEN')
 TELEGRAM_BOT_USERNAME = os.getenv('TELEGRAM_BOT_USERNAME', 'your_bot_username')
 
+PROJECT_TON_WALLET = 'UQAW1dSI8WjwEXnAQ98MJVYyOQ8D7egvHmKxAvH_XWRLjr-r'
+
 # REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -189,5 +191,5 @@ GAME_SETTINGS = {
 }
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://ff5b-213-230-86-59.ngrok-free.app",
+    "https://62e0-84-54-70-150.ngrok-free.app",
 ]

@@ -4,84 +4,88 @@
 {% block title %}Oxiri P2P — Магазин{% endblock %}
 
 {% block content %}
-<div class="py-8 max-w-lg mx-auto">
-  <h1 class="text-2xl font-bold mb-8 text-center">Магазин</h1>
-
-  <!-- TON-дерево -->
-  <div class="card p-6 mb-8 text-center relative">
-    <div class="flex justify-center mb-4 relative">
-      {% if not user_has_ton_tree %}
-        <img src="{% static 'images/tree_1.png' %}" alt="TON Tree Locked"
-             class="h-20 opacity-30 absolute left-1/2 top-4 -translate-x-1/2 z-0">
-        <img src="{% static 'images/locked.png' %}" alt="lock"
-             class="h-10 w-10 absolute left-1/2 top-8 -translate-x-1/2 z-10">
-
-          {% else %}
-          <a href="/tree/{{ ton_tree.id }}/" class="...">Перейти к дереву</a>
-      {% endif %}
-      <img src="{% static 'images/tree_1.png' %}" alt="TON Tree"
-           class="h-24 {% if not user_has_ton_tree %}opacity-20 blur-sm{% endif %}">
-    </div>
-    <div class="mb-2 font-semibold text-lg">TON-Дерево</div>
-    <div class="mb-2 text-sm opacity-70">Генерирует TON, участвует в раздаче токенов.</div>
-    {% if not user_has_ton_tree %}
-      <a href="/shop/buy/tree/ton/" class="block mt-4 w-full py-2 bg-blue-600 text-white text-center rounded-lg font-semibold">
-        Купить за 1 TON
-      </a>
-    {% else %}
-      <a href="/tree/{{ ton_tree.id }}/" class="block mt-4 w-full py-2 bg-blue-300 text-center rounded-lg font-semibold">
-        Перейти к дереву
-      </a>
-    {% endif %}
-  </div>
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li class="mb-2 p-2 rounded bg-green-200 text-green-800">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+<div class="mb-4 text-center">
+  Баланс: <b>{{ user.ton_balance }}</b> TON
+</div>
 
   <div class="grid gap-6">
-
-    <!-- Автополив 24ч -->
+    {% for item in items %}
     <div class="card p-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <img src="{% static 'images/watering_can.png' %}" alt="Автополив" class="h-10 w-10">
+        <img src="{% static item.image %}" alt="{{ item.name }}" class="h-10 w-10">
         <div>
-          <div class="font-semibold">Автополив</div>
-          <div class="text-xs opacity-60">Срок: 24ч</div>
+          <div class="font-semibold">{{ item.name }}</div>
+          {% if item.duration %}
+            <div class="text-xs opacity-60">Срок: {{ item.duration }} ч.</div>
+          {% endif %}
+          <div class="text-xs opacity-60">
+            Цена: {{ item.price }} {{ item.price_token_type }}
+          </div>
         </div>
       </div>
-      <a href="/shop/buy/autowater/1/" class="bg-blue-500 text-white rounded-full px-5 py-2 font-semibold">Купить 1 TON</a>
+      <form method="post" action="{% url 'shop:buy_shop_item' item.id %}">
+        {% csrf_token %}
+        <button type="submit" class="bg-blue-500 text-white rounded-full px-5 py-2 font-semibold">
+          Купить
+        </button>
+      </form>
     </div>
-    <!-- Автополив 48ч -->
-    <div class="card p-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="{% static 'images/watering_can.png' %}" alt="Автополив" class="h-10 w-10">
-        <div>
-          <div class="font-semibold">Автополив</div>
-          <div class="text-xs opacity-60">Срок: 48ч</div>
-        </div>
-      </div>
-      <a href="/shop/buy/autowater/2/" class="bg-blue-500 text-white rounded-full px-5 py-2 font-semibold">Купить 2 TON</a>
-    </div>
-    <!-- Удобрение -->
-    <div class="card p-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="{% static 'images/seed.png' %}" alt="Удобрение" class="h-10 w-10">
-        <div>
-          <div class="font-semibold">Удобрение</div>
-          <div class="text-xs opacity-60">Доход: ×2<br>Срок: 24ч</div>
-        </div>
-      </div>
-      <a href="/shop/buy/fertilizer/1/" class="bg-blue-500 text-white rounded-full px-5 py-2 font-semibold">Купить 1 TON</a>
-    </div>
-    <!-- Ветки / улучшения -->
+    {% endfor %}
+    <!-- Ветки/Улучшения (instant товар) -->
     <div class="card p-4 flex flex-col gap-3 items-center">
       <div class="flex items-center gap-3 mb-2">
         <img src="{% static 'images/tree_1.png' %}" alt="Ветка" class="h-10 w-10">
         <div class="font-semibold">Ветки / Улучшение / Дерево</div>
       </div>
-      <form action="/shop/buy/branches/" method="post" class="flex items-center gap-2">
-        {% csrf_token %}
-        <input type="number" name="quantity" min="1" max="100" value="1" class="w-16 px-2 py-1 border rounded-lg text-center" placeholder="Кол-во">
-        <button type="submit" class="bg-blue-500 text-white rounded-full px-5 py-2 font-semibold">1 шт = 1 TON</button>
-      </form>
+      <form action="{% url 'shop:buy_branches' %}" method="post" class="flex items-center gap-2">
+  {% csrf_token %}
+  <input
+    type="number"
+    name="quantity"
+    min="1"
+    max="100"
+    value="1"
+    style="width: 60px; background: #eef4ff; color: #222; border: 1px solid #bcd;"
+    class="rounded-lg px-2 py-1 text-center"
+    placeholder="Кол-во"
+    required
+  >
+  <button type="submit" class="bg-blue-500 text-white rounded-full px-5 py-2 font-semibold">
+    Купить ветки
+  </button>
+</form>
+
     </div>
+  </div>
+
+  <h2 class="text-xl font-bold mt-10 mb-4 text-center">Мой инвентарь</h2>
+  <div class="grid gap-3">
+    {% for purchase in user.purchases.all %}
+      <div class="card p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="{% static purchase.item.image %}" alt="{{ purchase.item.name }}" class="h-8 w-8">
+          <div>
+            <div class="font-semibold">{{ purchase.item.name }}</div>
+            {% if purchase.item.duration %}
+              <div class="text-xs opacity-60">Срок: {{ purchase.item.duration }} ч.</div>
+            {% endif %}
+          </div>
+        </div>
+        <form method="post" action="{% url 'use_shop_item' purchase.id %}">
+          {% csrf_token %}
+          <button type="submit" class="bg-green-500 text-white rounded-full px-4 py-1 font-semibold">Использовать</button>
+        </form>
+      </div>
+    {% empty %}
+      <div class="text-center text-gray-500">Нет купленных предметов.</div>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}

@@ -2,14 +2,17 @@
 
 from decimal import Decimal
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Tree, TonDistribution
 from users.models import User as TelegramUser, User
+from .utils import apply_item_to_tree, use_purchase_for_cf_tree
 
 
 # Если у вас в проекте есть модель для логов, раскомментируйте импорт и используйте её.
@@ -86,6 +89,7 @@ def tree_detail(request, tree_id):
     Для TON: дополнительно передаем данные о раздаче TON.
     """
     user = get_current_user(request)
+    now = timezone.now()
     if not user:
         return render(request, "not_authenticated.html")
 
@@ -101,6 +105,8 @@ def tree_detail(request, tree_id):
     all_cf_grown = User.objects.aggregate(total=Sum('cf_balance'))['total'] or 0
 
     user_cf_grown = user.cf_balance if user else 0
+    auto_water_active = bool(tree.auto_water_until and tree.auto_water_until > now)
+    fertilizer_active = bool(tree.fertilized_until and tree.fertilized_until > now)
 
 
     # Базовый контекст
@@ -115,6 +121,9 @@ def tree_detail(request, tree_id):
         'total_created_cf': TOTAL_CREATED_CF,
         'all_cf_grown': all_cf_grown,
         "user_cf_grown": user_cf_grown,
+        'now': now,
+        'auto_water_active': auto_water_active,
+        'fertilizer_active': fertilizer_active,
     }
 
     # --- Логи дерева ---
@@ -152,6 +161,8 @@ def tree_detail(request, tree_id):
     return render(request, "tree/detail.html", context)
 
 
+from django.utils.timezone import localtime
+
 def water_tree(request, tree_id):
     user = get_current_user(request)
     if not user:
@@ -164,6 +175,9 @@ def water_tree(request, tree_id):
 
     result = tree.water()
 
+    # Форматируем дату так же, как в шаблоне
+    last_watered_str = localtime(tree.last_watered).strftime("%d.%m.%Y %H:%M") if tree.last_watered else "Никогда"
+
     response_data = {
         "status": "success",
         "message": "Дерево успешно полито",
@@ -172,11 +186,12 @@ def water_tree(request, tree_id):
         "branches_collected": tree.branches_collected,
         "amount_cf": float(result.get("amount_cf", 0)),
         "amount_ton": float(result.get("amount_ton", 0)),
-        # Новые поля для обновления на фронте:
         "water_percent": tree.get_water_percent(),
         "pending_income": float(tree.get_pending_income()),
+        "last_watered": last_watered_str,
     }
     return JsonResponse(response_data)
+
 
 
 def upgrade_tree(request, tree_id):
@@ -246,3 +261,11 @@ def collect_income(request, tree_id):
         "collected": float(pending),
         "new_balance_cf": float(user.cf_balance),
     })
+
+def use_shop_item(request, purchase_id):
+    success, msg = use_purchase_for_cf_tree(request.user, purchase_id)
+    success, message = apply_item_to_tree(request.user, purchase_id)
+    from trees.models import Tree
+    cf_tree = Tree.objects.get(user=request.user, type='CF')
+    messages.info(request, message)
+    return redirect('tree_detail', tree_id=cf_tree.id)

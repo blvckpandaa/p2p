@@ -7,7 +7,6 @@ class ShopItem(models.Model):
         ('auto_water', 'Авто-полив'),
         ('fertilizer', 'Удобрение'),
         ('ton_tree', 'Дерево TON'),
-        ('not_tree', 'Дерево NOT'),
         ('cf_slot', 'CF Слот'),
     ]
     

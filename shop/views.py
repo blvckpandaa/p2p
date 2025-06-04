@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
 from trees.models import Tree
+from trees.utils import use_purchase_for_cf_tree
 from trees.views import get_current_user
 from .models import ShopItem, Purchase
 from django.utils import timezone
@@ -42,6 +44,37 @@ def buy_auto_water(request):
     return JsonResponse({"status": "success", "message": "Автополив активирован!"})
 
 @require_POST
+
+def buy_shop_item(request, item_id):
+    user = get_current_user(request)
+    item = get_object_or_404(ShopItem, id=item_id, is_active=True)
+    price = item.price
+
+    # Спишем токены
+    if item.price_token_type == 'CF':
+        if user.cf_balance < price:
+            return JsonResponse({"status": "error", "message": "Недостаточно CF"}, status=400)
+        user.cf_balance -= price
+        user.save(update_fields=["cf_balance"])
+    elif item.price_token_type == 'TON':
+        if user.ton_balance < price:
+            return JsonResponse({"status": "error", "message": "Недостаточно TON"}, status=400)
+        user.ton_balance -= price
+        user.save(update_fields=["ton_balance"])
+
+    valid_until = timezone.now() + timezone.timedelta(hours=item.duration) if item.duration else None
+    Purchase.objects.create(user=user, item=item, price_paid=price, valid_until=valid_until)
+    from django.contrib import messages
+    messages.success(request, f"{item.name} куплен и добавлен в инвентарь!")
+    return redirect('shop:shop')
+@require_POST
+
+def use_shop_item(request, purchase_id):
+    user = get_current_user(request)
+    success, msg = use_purchase_for_cf_tree(user, purchase_id)
+    status = "success" if success else "error"
+    return JsonResponse({"status": status, "message": msg})
+@require_POST
 def buy_fertilizer(request):
     user = get_current_user(request)
     tree_id = request.POST.get("tree_id")
@@ -59,17 +92,26 @@ def buy_fertilizer(request):
 @require_POST
 def buy_branches(request):
     user = get_current_user(request)
-    tree_id = request.POST.get("tree_id")
-    qty = int(request.POST.get("quantity", 1))
-    ton_price = qty  # 1 ветка = 1 TON
-    tree = get_object_or_404(Tree, id=tree_id, user=user)
+    quantity = int(request.POST.get("quantity", 1))
+    # По умолчанию выбираем CF-дерево (или первый из всех деревьев пользователя)
+    tree = Tree.objects.filter(user=user, type='CF').first()
+    if not tree:
+        messages.error(request, "У вас нет дерева для улучшения.")
+        return redirect('shop:shop')
+
+    ton_price = quantity  # 1 ветка = 1 TON
+
     if user.ton_balance < ton_price:
-        return JsonResponse({"status": "error", "message": "Недостаточно TON"}, status=400)
-    tree.branches_collected += qty
+        messages.error(request, "Недостаточно TON для покупки веток.")
+        return redirect('shop:shop')
+
+    # Списываем TON и начисляем ветки
+    tree.branches_collected += quantity
     tree.save(update_fields=["branches_collected"])
     user.ton_balance -= ton_price
     user.save(update_fields=["ton_balance"])
-    return JsonResponse({"status": "success", "message": f"Куплено веток: {qty}"})
+    messages.success(request, f"Куплено веток: {quantity}")
+    return redirect('shop:shop')
 
 def buy_ton_tree(request):
     user = get_current_user(request)
