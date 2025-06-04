@@ -43,7 +43,7 @@ TOKEN = "8026375224:AAEi4Epjn6MviJMsUEjnsHnHfgGNZTucSYs"
 API_URL = f"https://api.telegram.org/bot{TOKEN}"
 
 # URL WebApp (ваш HTTPS‐домен, на котором запущен Django-проектор)
-WEBAPP_URL_BASE = "https://ff5b-213-230-86-59.ngrok-free.app/telegram_login/"
+WEBAPP_URL_BASE = "https://764a-185-139-138-89.ngrok-free.app/telegram_login/"
 
 last_update_id = 0
 

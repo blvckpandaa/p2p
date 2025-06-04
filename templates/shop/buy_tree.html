@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Покупка дерева {{ tree_type }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Покупка дерева {{ tree_type }}</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Дерево {{ tree_type }}</h5>
+            
+            {% if tree_type == 'CF' %}
+                <p class="card-text">CF дерево - это базовое дерево, которое доступно всем пользователям бесплатно.</p>
+                <p class="card-text">Оно приносит токены CF, которые можно использовать для различных действий в игре.</p>
+                <div class="text-center">
+                    <img src="/static/images/cf_tree.png" alt="CF Tree" class="img-fluid mb-3" style="max-height: 200px;">
+                </div>
+                <form id="buyTreeForm" method="post" class="mt-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-block">Получить бесплатно</button>
+                </form>
+            {% elif tree_type == 'TON' %}
+                <p class="card-text">TON дерево - это улучшенное дерево, которое приносит токены TON.</p>
+                <p class="card-text">Токены TON можно использовать для стейкинга и торговли на P2P-бирже.</p>
+                <div class="text-center">
+                    <img src="/static/images/ton_tree.png" alt="TON Tree" class="img-fluid mb-3" style="max-height: 200px;">
+                </div>
+                
+                {% if item %}
+                    <p class="card-text">Стоимость: {{ item.price }} {{ item.price_token_type }}</p>
+                    <form id="buyTreeForm" method="post" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-block">Купить за {{ item.price }} {{ item.price_token_type }}</button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning">
+                        Этот товар временно недоступен
+                    </div>
+                {% endif %}
+            {% elif tree_type == 'NOT' %}
+                <p class="card-text">NOT дерево - это премиум дерево, которое приносит редкие токены NOT.</p>
+                <p class="card-text">Токены NOT имеют высокую ценность и могут использоваться для особых действий.</p>
+                <div class="text-center">
+                    <img src="/static/images/not_tree.png" alt="NOT Tree" class="img-fluid mb-3" style="max-height: 200px;">
+                </div>
+                
+                {% if item %}
+                    <p class="card-text">Стоимость: {{ item.price }} {{ item.price_token_type }}</p>
+                    <form id="buyTreeForm" method="post" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-block">Купить за {{ item.price }} {{ item.price_token_type }}</button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning">
+                        Этот товар временно недоступен
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="text-center mt-3">
+        <a href="{% url 'shop' %}" class="btn btn-secondary">Вернуться в магазин</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('buyTreeForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(new FormData(form))
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        window.location.href = '{% url "home" %}';
+                    } else {
+                        alert(data.message || 'Произошла ошибка');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при отправке запроса');
+                });
+            });
+        }
+    });
+</script>
+{% endblock %} 
