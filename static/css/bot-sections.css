@@ -1,0 +1,263 @@
+/* Стили для секций мобильного интерфейса Telegram-бота */
+
+/* Общие стили для всех секций */
+.section-container {
+    padding: 15px;
+    padding-bottom: 80px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+/* Стили для секции магазина */
+.shop-section {
+    background-color: #2b5278;
+}
+
+.balance-info {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tree-card {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.tree-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.tree-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.tree-image {
+    max-width: 100px;
+    margin: 15px auto;
+    display: block;
+}
+
+.tree-info {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.tree-free {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Стили для секции рефералов */
+.referral-section {
+    background-color: #2b5278;
+}
+
+.referral-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.referral-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.referral-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.referral-bonus {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.referral-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.referral-link-container {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.referral-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+    word-break: break-all;
+    font-size: 14px;
+    text-align: center;
+}
+
+.referral-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    flex: 1;
+    background-color: #2b5278;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.referral-steps {
+    margin-top: 20px;
+}
+
+.step-item {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.step-number {
+    background-color: #2b5278;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.step-text {
+    font-size: 14px;
+}
+
+/* Стили для секции P2P */
+.p2p-section {
+    background-color: #2b5278;
+}
+
+.p2p-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: #17212b;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.p2p-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.p2p-tab.active {
+    background-color: #2b5278;
+    font-weight: bold;
+}
+
+.crypto-selector {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: #17212b;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.crypto-option {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.crypto-option.active {
+    background-color: #2b5278;
+    font-weight: bold;
+}
+
+.order-card {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.order-type {
+    font-weight: bold;
+}
+
+.order-type.buy {
+    color: #4CAF50;
+}
+
+.order-type.sell {
+    color: #F44336;
+}
+
+.order-price {
+    font-weight: bold;
+}
+
+.order-details {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.order-action {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.action-button {
+    background-color: #2b5278;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+}

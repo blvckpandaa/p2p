@@ -38,12 +38,15 @@ import json
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Токен вашего бота (замените на реальный)
-TOKEN = "7920987349:AAGm0Ed0uefXGMQ-VC6KyqaQhUXRnvRQ02w"
+# Импортируем настройки из config.py
+from bot.config import BOT_TOKEN, WEBAPP_URL
+
+# Токен вашего бота
+TOKEN = BOT_TOKEN
 API_URL = f"https://api.telegram.org/bot{TOKEN}"
 
 # URL WebApp (ваш HTTPS‐домен, на котором запущен Django-проектор)
-WEBAPP_URL_BASE = "https://764a-185-139-138-89.ngrok-free.app/telegram_login/"
+WEBAPP_URL_BASE = f"{WEBAPP_URL}/telegram_login"
 
 last_update_id = 0
 

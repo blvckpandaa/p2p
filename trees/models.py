@@ -18,6 +18,7 @@ class Tree(models.Model):
     branches_collected = models.IntegerField(default=0)
     last_watered = models.DateTimeField(null=True, blank=True)
     fertilized_until = models.DateTimeField(null=True, blank=True)  # Время действия удобрения
+    auto_water_until = models.DateTimeField(null=True, blank=True)  # Время действия автополива
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -43,6 +44,12 @@ class Tree(models.Model):
         if not self.fertilized_until:
             return False
         return timezone.now() < self.fertilized_until
+        
+    def is_auto_watered(self):
+        """Проверяет, активен ли автополив"""
+        if not self.auto_water_until:
+            return False
+        return timezone.now() < self.auto_water_until
     
     def get_current_income(self):
         """Возвращает текущий доход дерева с учетом удобрений"""
@@ -78,12 +85,19 @@ class Tree(models.Model):
     
     def water(self):
         """Поливает дерево"""
+        # Проверяем, активен ли автополив
+        is_auto = self.is_auto_watered()
+        
         self.last_watered = timezone.now()
         self.save()
         
         # С вероятностью 10% выпадает ветка (только если уровень < 5)
+        # Если автополив активен, увеличиваем шанс выпадения ветки
         if self.level < 5:
             branch_drop_chance = settings.GAME_SETTINGS.get('BRANCH_DROP_CHANCE', 0.1)
+            if is_auto:
+                branch_drop_chance *= 1.5  # Увеличиваем шанс на 50% при автополиве
+                
             if random.random() < branch_drop_chance:
                 self.branches_collected += 1
                 self.save()

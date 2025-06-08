@@ -2,83 +2,85 @@
 
 {% block title %}Oxiri P2P - Магазин{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="/static/css/modern-shop.css">
+{% endblock %}
+
 {% block content %}
-<div class="py-6">
+<div class="shop-container">
     <!-- Заголовок -->
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-bold">Магазин</h1>
-        <div class="flex space-x-2">
-            <div class="text-sm">
-                <span class="text-xs opacity-70">Баланс:</span>
-                <span class="font-semibold">{{ user.balance }} CF</span>
-            </div>
+    <div class="shop-header">
+        <h1 class="shop-title">Магазин</h1>
+        <div class="shop-balance">
+            <span class="balance-label">Баланс:</span>
+            <span class="balance-amount">{{ user.balance }} CF</span>
         </div>
     </div>
     
     <!-- Категории товаров -->
-    <div class="grid grid-cols-3 gap-2 mb-6">
-        <a href="#trees" class="text-center py-2 rounded-lg bg-primary/50">
+    <div class="shop-categories">
+        <a href="#trees" class="category-tab active">
             Деревья
         </a>
-        <a href="#fertilizers" class="text-center py-2 rounded-lg bg-primary/30">
+        <a href="#fertilizers" class="category-tab">
             Удобрения
         </a>
-        <a href="#boosters" class="text-center py-2 rounded-lg bg-primary/30">
+        <a href="#boosters" class="category-tab">
             Бустеры
         </a>
     </div>
     
     <!-- Раздел деревьев -->
-    <div id="trees" class="mb-8">
-        <h2 class="text-lg font-semibold mb-4">Деревья</h2>
+    <div id="trees" class="shop-section">
+        <h2 class="section-title">Деревья</h2>
         
         <!-- CF Дерево -->
-        <div class="card p-4 mb-4">
-            <div class="flex justify-between items-start mb-3">
+        <div class="product-card tree-card">
+            <div class="product-header">
                 <div>
-                    <h3 class="font-semibold">CF Дерево</h3>
-                    <p class="text-sm opacity-70">Базовое дерево</p>
+                    <h3 class="product-name">CF Дерево</h3>
+                    <p class="product-description">Базовое дерево</p>
                 </div>
                 {% if user_has_cf_tree %}
-                <span class="bg-secondary/20 px-3 py-1 rounded-full text-xs">
+                <span class="product-badge owned">
                     Уже приобретено
                 </span>
                 {% else %}
-                <span class="bg-accent/20 text-accent px-3 py-1 rounded-full text-xs">
+                <span class="product-badge free">
                     Бесплатно
                 </span>
                 {% endif %}
             </div>
             
-            <div class="flex mb-4">
-                <div class="w-24 h-24 flex items-center justify-center">
-                    <img src="/static/images/tree_1.png" alt="CF Tree" class="h-20">
+            <div class="product-content">
+                <div class="product-image">
+                    <img src="/static/images/tree_1.png" alt="CF Tree">
                 </div>
-                <div class="flex-1 ml-4">
-                    <div class="mb-2">
-                        <div class="text-xs opacity-70">Доход:</div>
-                        <div class="font-semibold">0.1 CF/час</div>
+                <div class="product-details">
+                    <div class="product-feature">
+                        <div class="feature-label">Доход:</div>
+                        <div class="feature-value">0.1 CF/час</div>
                     </div>
-                    <div>
-                        <div class="text-xs opacity-70">Особенность:</div>
-                        <div class="text-sm">Можно улучшать до 5 уровня</div>
+                    <div class="product-feature">
+                        <div class="feature-label">Особенность:</div>
+                        <div class="feature-value">Можно улучшать до 5 уровня</div>
                     </div>
                 </div>
             </div>
             
             {% if not user_has_cf_tree %}
-            <a href="/shop/buy/tree/cf/" class="block w-full py-2 bg-accent text-dark text-center rounded-lg font-semibold">
+            <a href="/shop/buy/tree/cf/" class="product-button primary">
                 Получить бесплатно
             </a>
             {% else %}
-            <a href="/tree/{{ cf_tree.id }}/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+            <a href="/tree/{{ cf_tree.id }}/" class="product-button secondary">
                 Перейти к дереву
             </a>
             {% endif %}
         </div>
         
         <!-- TON Дерево -->
-        <div class="card p-4 mb-4">
+        <div class="product-card tree-card">
             <div class="flex justify-between items-start mb-3">
                 <div>
                     <h3 class="font-semibold">TON Дерево</h3>
@@ -130,12 +132,12 @@
     </div>
     
     <!-- Раздел удобрений -->
-    <div id="fertilizers" class="mb-8">
-        <h2 class="text-lg font-semibold mb-4">Удобрения</h2>
+    <div id="fertilizers" class="shop-section">
+        <h2 class="section-title">Удобрения</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Удобрение на 6 часов -->
-            <div class="card p-4">
+            <div class="product-card fertilizer-card">
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <h3 class="font-semibold">Базовое удобрение</h3>
@@ -158,13 +160,13 @@
                     </div>
                 </div>
                 
-                <a href="/shop/buy/fertilizer/6/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                <a href="/shop/buy/fertilizer/6/" class="product-button secondary">
                     Купить за 10 CF
                 </a>
             </div>
             
             <!-- Удобрение на 12 часов -->
-            <div class="card p-4">
+            <div class="product-card fertilizer-card">
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <h3 class="font-semibold">Улучшенное удобрение</h3>
@@ -187,13 +189,13 @@
                     </div>
                 </div>
                 
-                <a href="/shop/buy/fertilizer/12/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                <a href="/shop/buy/fertilizer/12/" class="product-button secondary">
                     Купить за 18 CF
                 </a>
             </div>
             
             <!-- Удобрение на 24 часа -->
-            <div class="card p-4">
+            <div class="product-card fertilizer-card">
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <h3 class="font-semibold">Премиум удобрение</h3>
@@ -216,7 +218,7 @@
                     </div>
                 </div>
                 
-                <a href="/shop/buy/fertilizer/24/" class="block w-full py-2 bg-secondary/70 text-center rounded-lg">
+                <a href="/shop/buy/fertilizer/24/" class="product-button secondary">
                     Купить за 30 CF
                 </a>
             </div>
@@ -224,12 +226,12 @@
     </div>
     
     <!-- Раздел бустеров -->
-    <div id="boosters" class="mb-8">
-        <h2 class="text-lg font-semibold mb-4">Бустеры</h2>
+    <div id="boosters" class="shop-section">
+        <h2 class="section-title">Бустеры</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Автополив на 3 дня -->
-            <div class="card p-4">
+            <div class="product-card booster-card">
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <h3 class="font-semibold">Автополив</h3>

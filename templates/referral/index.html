@@ -1,43 +1,58 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Oxiri P2P - Реферальная{% endblock %}
 
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/modern-referral.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="py-6">
-    <div class="flex items-center mb-6">
-        <h1 class="text-xl font-bold">Реферальная</h1>
-    </div>
-
-    <div class="mb-6">
-        <div class="text-base font-semibold mb-2">{{ main_stats|safe }}</div>
-        <div class="text-sm text-blue-400">{{ motivation_text|safe }}</div>
-    </div>
-
-    <div class="card p-4 mb-6">
-        <div class="grid grid-cols-2 gap-3">
-            <div class="bg-primary/30 p-3 rounded-lg text-center">
-                <div class="text-xs opacity-70 mb-1">Приглашено друзей</div>
-                <div class="font-semibold text-lg">{{ referral_count }}</div>
-            </div>
-            <div class="bg-primary/30 p-3 rounded-lg text-center">
-                <div class="text-xs opacity-70 mb-1">Получено токенов</div>
-                <div class="font-semibold text-lg">{{ referral_rewards }} CF</div>
-            </div>
+<div class="referral-container">
+    <div class="referral-header">
+        <div class="referral-header-content">
+            <h1 class="referral-title">Реферальная программа</h1>
+            <div class="referral-subtitle">{{ main_stats|safe }}</div>
+            <div class="referral-subtitle">{{ motivation_text|safe }}</div>
         </div>
     </div>
 
-    <div class="card p-4 mb-6">
-        <h2 class="text-lg font-semibold mb-3">Ваша реферальная ссылка</h2>
-        <div class="bg-primary/30 p-3 rounded-lg mb-4">
-            <div class="text-sm break-all" id="ref-link">{{ referral_link }}</div>
+    <div class="referral-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ referral_count }}</div>
+            <div class="stat-label">Приглашено друзей</div>
         </div>
-        <button id="copy-btn" class="w-full py-2 bg-secondary hover:bg-secondary/80 transition text-center rounded-lg">
-            Копировать ссылку
-        </button>
+        <div class="stat-card">
+            <div class="stat-value">{{ referral_rewards }}</div>
+            <div class="stat-label">Получено CF токенов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Уровня вознаграждения</div>
+        </div>
     </div>
 
-    <div class="card p-4 mb-6">
-        <h2 class="text-lg font-semibold mb-3">О программе</h2>
+    <div class="referral-link-card">
+        <h2 class="referral-link-title">Ваша реферальная ссылка</h2>
+        <div class="referral-code-container">
+            {{ referral_code }}
+        </div>
+        <div class="referral-link" id="ref-link">
+            {{ referral_link }}
+        </div>
+        <div class="referral-buttons">
+            <button id="copy-btn" class="referral-button primary">
+                Копировать ссылку
+            </button>
+            <a href="https://t.me/share/url?url={{ referral_link }}" target="_blank" class="referral-button secondary">
+                Поделиться
+            </a>
+        </div>
+    </div>
+
+    <div class="referral-link-card">
+        <h2 class="referral-link-title">О программе</h2>
         <div class="space-y-4">
             <div class="flex items-start">
                 <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center mr-3 flex-shrink-0">
@@ -66,59 +81,72 @@
         </div>
     </div>
 
-    <div class="card p-4 mb-6">
-        <h2 class="text-lg font-semibold mb-3">Уровни программы</h2>
-        <div class="space-y-3">
-            <div class="bg-primary/30 p-3 rounded-lg flex items-center justify-between">
-                <div>
-                    <div class="font-semibold">Уровень 1</div>
-                    <div class="text-xs opacity-70">Ваши прямые рефералы</div>
-                </div>
-                <div class="text-right">
-                    <div class="font-semibold">10% CF</div>
-                    <div class="text-xs opacity-70">5% TON / NOT</div>
-                </div>
+    <div class="referral-levels">
+        <h2 class="referral-levels-title">Уровни программы</h2>
+        <div class="levels-grid">
+            <div class="level-card active">
+                <div class="level-number">Уровень 1</div>
+                <div class="level-title">Прямые рефералы</div>
+                <div class="level-requirement">Ваши прямые приглашения</div>
+                <div class="level-reward">10% CF</div>
+                <div class="level-reward">5% TON / NOT</div>
             </div>
-            <div class="bg-primary/20 p-3 rounded-lg flex items-center justify-between">
-                <div>
-                    <div class="font-semibold">Уровень 2</div>
-                    <div class="text-xs opacity-70">Рефералы ваших рефералов</div>
-                </div>
-                <div class="text-right">
-                    <div class="font-semibold">5% CF</div>
-                    <div class="text-xs opacity-70">2% TON / NOT</div>
-                </div>
+            <div class="level-card">
+                <div class="level-number">Уровень 2</div>
+                <div class="level-title">Рефералы 2-го уровня</div>
+                <div class="level-requirement">Рефералы ваших рефералов</div>
+                <div class="level-reward">5% CF</div>
+                <div class="level-reward">2% TON / NOT</div>
             </div>
-            <div class="bg-primary/10 p-3 rounded-lg flex items-center justify-between">
-                <div>
-                    <div class="font-semibold">Уровень 3</div>
-                    <div class="text-xs opacity-70">Рефералы рефералов ваших рефералов</div>
-                </div>
-                <div class="text-right">
-                    <div class="font-semibold">2% CF</div>
-                    <div class="text-xs opacity-70">1% TON / NOT</div>
-                </div>
+            <div class="level-card">
+                <div class="level-number">Уровень 3</div>
+                <div class="level-title">Рефералы 3-го уровня</div>
+                <div class="level-requirement">Рефералы рефералов ваших рефералов</div>
+                <div class="level-reward">2% CF</div>
+                <div class="level-reward">1% TON / NOT</div>
             </div>
         </div>
     </div>
 
-    <div class="card p-4">
-        <h2 class="text-lg font-semibold mb-3">Ваши рефералы</h2>
+    <div class="referrals-list">
+        <h2 class="referrals-list-title">Ваши рефералы</h2>
         {% if referrals %}
-        <div class="space-y-2">
-            {% for referral in referrals %}
-            <div class="bg-primary/20 p-3 rounded-lg flex justify-between items-center">
-                <div>
-                    <div class="font-semibold">{{ referral.user.username }}</div>
-                    <div class="text-xs opacity-70">Присоединился: {{ referral.created_at|date:"d.m.Y" }}</div>
-                </div>
-                <div class="text-right">
-                    <div class="font-semibold">+{{ referral.total_reward }} CF</div>
-                    <div class="text-xs opacity-70">Уровень {{ referral.level }}</div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        <table class="referral-table">
+            <thead>
+                <tr>
+                    <th>Пользователь</th>
+                    <th>Дата</th>
+                    <th>Доход</th>
+                    <th>Уровень</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for referral in referrals %}
+                <tr>
+                    <td>
+                        <div class="referral-user">
+                            <div class="referral-user-info">
+                                <span class="referral-username">{{ referral.user.username }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="referral-date">{{ referral.created_at|date:"d.m.Y" }}</div>
+                    </td>
+                    <td>
+                        <div class="referral-income">+{{ referral.total_reward }} CF</div>
+                    </td>
+                    <td>
+                        <div>{{ referral.level }}</div>
+                    </td>
+                    <td>
+                        <span class="referral-status active">Активен</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% else %}
         <div class="bg-primary/20 p-6 rounded-lg text-center">
             <p class="mb-3">У вас пока нет рефералов</p>
@@ -136,19 +164,17 @@
         const refLink = document.getElementById('ref-link');
         copyBtn.addEventListener('click', function() {
             const tempInput = document.createElement('input');
-            tempInput.value = refLink.textContent;
+            tempInput.value = refLink.textContent.trim();
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
             const originalText = copyBtn.textContent;
             copyBtn.textContent = 'Скопировано!';
-            copyBtn.classList.add('bg-accent', 'text-dark');
-            copyBtn.classList.remove('bg-secondary');
+            copyBtn.classList.add('copied');
             setTimeout(() => {
                 copyBtn.textContent = originalText;
-                copyBtn.classList.remove('bg-accent', 'text-dark');
-                copyBtn.classList.add('bg-secondary');
+                copyBtn.classList.remove('copied');
             }, 2000);
         });
     });

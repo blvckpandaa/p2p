@@ -1,6 +1,6 @@
 # trees/views.py
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import Tree
 from users.models import User as TelegramUser
@@ -41,6 +41,28 @@ def home(request):
         "user": user
     })
 
+def tree_list(request):
+    """
+    Отображает список всех деревьев пользователя.
+    Если пользователь не авторизован, перенаправляет на страницу авторизации.
+    """
+    user = get_current_user(request)
+    if not user:
+        return render(request, "not_authenticated.html")
+
+    # Получаем все деревья пользователя
+    trees = Tree.objects.filter(user=user)
+    
+    # Если у пользователя нет деревьев, создаем первое дерево
+    if not trees.exists():
+        Tree.objects.create(user=user, type="CF")
+        trees = Tree.objects.filter(user=user)
+
+    return render(request, "tree/list.html", {
+        "trees": trees,
+        "user": user
+    })
+
 def tree_detail(request, tree_id):
     user = get_current_user(request)
     if not user:
@@ -67,10 +89,10 @@ def tree_detail(request, tree_id):
     context["auto_water_enabled"] = False
     context["auto_water_remaining"] = 0
     
-    if user.auto_water_until and user.auto_water_until > timezone.now():
+    if tree.auto_water_until and tree.auto_water_until > timezone.now():
         context["auto_water_enabled"] = True
-        time_diff = user.auto_water_until - timezone.now()
-        context["auto_water_remaining"] = time_diff.days + 1
+        time_diff = tree.auto_water_until - timezone.now()
+        context["auto_water_remaining"] = int(time_diff.total_seconds() / 3600) + 1
     
     # Проверка статуса удобрения
     context["fertilizer_active"] = False
@@ -176,3 +198,36 @@ def collect_income(request, tree_id):
         "income": income,
         "new_balance": user.cf_balance if tree.type == "CF" else user.ton_balance
     })
+
+def create_tree(request):
+    """
+    Создает новое дерево для пользователя.
+    Пользователь может выбрать тип дерева: CF или TON.
+    """
+    user = get_current_user(request)
+    if not user:
+        return render(request, "not_authenticated.html")
+    
+    # Если это GET-запрос, показываем форму создания дерева
+    if request.method == "GET":
+        return render(request, "tree/create.html", {"user": user})
+    
+    # Если это POST-запрос, создаем новое дерево
+    if request.method == "POST":
+        tree_type = request.POST.get("tree_type", "CF")  # По умолчанию CF
+        
+        # Проверяем, что тип дерева допустимый
+        if tree_type not in ["CF", "TON"]:
+            tree_type = "CF"  # Если недопустимый тип, используем CF по умолчанию
+        
+        # Создаем новое дерево
+        new_tree = Tree.objects.create(
+            user=user,
+            type=tree_type
+        )
+        
+        # Перенаправляем на страницу созданного дерева
+        return redirect('tree_detail', tree_id=new_tree.id)
+    
+    # Если запрос не GET и не POST, возвращаем ошибку
+    return JsonResponse({"status": "error", "message": "Метод не поддерживается"}, status=405)

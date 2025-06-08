@@ -3,9 +3,73 @@
     --primary: #3D50C7;
     --secondary: #6B75E6;
     --accent: #5AFF75;
+    --dark: #0D1F4A;
+    --background: #4B65E6;
+    --text: #FFFFFF;
+    --card-bg: rgba(255, 255, 255, 0.25);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --button-primary: #3D50C7;
+    --button-secondary: #6B75E6;
+    --button-accent: #5AFF75;
+    --bottom-nav-bg: #2C0E7E;
+    
+    /* Градиенты */
+    --blue-gradient: linear-gradient(135deg, #1A3A7E, #0D1F4A);
+    --purple-gradient: linear-gradient(135deg, #9D84E6, #C484E6);
+    --green-gradient: linear-gradient(135deg, #3EFFA2, #5AFF75);
+    --orange-gradient: linear-gradient(135deg, #FF9F5A, #FFC53E);
+    --pink-gradient: linear-gradient(135deg, #FF5A8F, #FF3E7F);
+    --cyan-gradient: linear-gradient(135deg, #5AE8FF, #3ECFFF);
+    
+    /* Эффекты свечения */
+    --blue-glow: 0 0 15px rgba(26, 58, 126, 0.7);
+    --green-glow: 0 0 15px rgba(62, 255, 162, 0.7);
+    --purple-glow: 0 0 15px rgba(157, 132, 230, 0.7);
+    --orange-glow: 0 0 15px rgba(255, 159, 90, 0.7);
+    --pink-glow: 0 0 15px rgba(255, 90, 143, 0.7);
+    --cyan-glow: 0 0 15px rgba(90, 232, 255, 0.7);
+}
+
+/* Добавляем поддержку темы Telegram */
+body.telegram-dark {
+    --primary: #3D50C7;
+    --secondary: #6B75E6;
+    --accent: #5AFF75;
     --background: #6B75E6;
     --dark: #0D1F4A;
     --text: #FFFFFF;
+    --card-bg: rgba(61, 80, 199, 0.3);
+    --card-border: rgba(255, 255, 255, 0.1);
+}
+
+body.telegram-light {
+    --primary: #3D50C7;
+    --secondary: #6B75E6;
+    --accent: #5AFF75;
+    --background: #F0F2F5;
+    --dark: #0D1F4A;
+    --text: #000000;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-border: rgba(107, 117, 230, 0.2);
+}
+
+body.telegram-light .card {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+body.telegram-light .bottom-nav {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+}
+
+body.telegram-light .bottom-nav svg {
+    color: var(--primary) !important;
+}
+
+body.telegram-light .bottom-nav span {
+    color: var(--dark);
 }
 
 /* Анимации */
@@ -33,31 +97,118 @@
 }
 
 @keyframes shine {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
+    0% { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes glow {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(90, 255, 117, 0.5)); }
+    50% { filter: drop-shadow(0 0 20px rgba(90, 255, 117, 0.8)); }
 }
 
 /* Общие стили */
 body {
     background-color: var(--background);
-    background-image: url('/static/images/bg.png');
-    background-size: cover;
-    background-position: bottom;
+    background-image: url('/static/images/bg-landscape.png'), linear-gradient(to bottom, #4B65E6, #6B75E6);
+    background-size: 100% auto, cover;
+    background-position: bottom center, center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     min-height: 100vh;
     padding-bottom: 70px;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Декоративные элементы фона */
+.floating-coin {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-image: url('/static/images/coin.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+    opacity: 0.8;
+    animation: float 4s infinite ease-in-out;
+}
+
+.floating-bubble {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-image: url('/static/images/bubble.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+    opacity: 0.6;
+    animation: float 5s infinite ease-in-out;
+}
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background: radial-gradient(circle at 20% 20%, rgba(107, 117, 230, 0.4) 0%, transparent 50%);
+    z-index: -1;
+}
+
+body::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background: radial-gradient(circle at 80% 80%, rgba(90, 255, 117, 0.2) 0%, transparent 50%);
+    z-index: -1;
 }
 
 /* Карточки и контейнеры */
 .card {
-    background-color: rgba(61, 80, 199, 0.3);
+    background-color: var(--card-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--card-border);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.blue-card {
+    background: var(--blue-gradient);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    padding: 15px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.info-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
 }
 
 .card-hover:hover {
@@ -69,20 +220,46 @@ body {
 /* Статусы и индикаторы */
 .status-indicator {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    margin-right: 6px;
+    position: relative;
 }
 
 .status-active {
     background-color: var(--accent);
-    box-shadow: 0 0 5px var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+}
+
+.status-active::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0.5;
+    animation: pulse 2s infinite;
 }
 
 .status-inactive {
-    background-color: #FF5A5A;
-    box-shadow: 0 0 5px #FF5A5A;
+    background-color: #FF5757;
+    box-shadow: 0 0 8px #FF5757;
+}
+
+.status-inactive::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    border: 2px solid #FF5757;
+    opacity: 0.5;
 }
 
 .status-pending {
@@ -103,107 +280,367 @@ body {
     animation: shine 2s ease-in-out infinite;
 }
 
-/* Элементы дерева */
-.tree-container {
-    height: 200px;
+.animate-rotate {
+    animation: rotate 8s linear infinite;
+}
+
+.animate-bounce {
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.animate-glow {
+    animation: glow 3s ease-in-out infinite;
+}
+
+.coin {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: url('/static/images/coin.png') no-repeat;
+    background-size: contain;
+    animation: float 3s ease-in-out infinite;
+    z-index: -1;
+}
+
+.bubble {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: float 5s ease-in-out infinite;
+    z-index: -1;
+}
+
+.tree-info {
+    min-height: 40px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
+    justify-content: space-between;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 15px;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+}
+
+.tree-info.success {
+background: rgba(90, 255, 117, 0.2);
+border-color: rgba(90, 255, 117, 0.3);
+}
+
+.tree-info.error {
+background: rgba(255, 87, 87, 0.2);
+border-color: rgba(255, 87, 87, 0.3);
+}
+
+.tree-container {
+height: 250px;
+display: flex;
+justify-content: center;
+align-items: center;
+position: relative;
+margin: 15px 0;
+background: url('/static/images/tree-bg.png');
+background-size: cover;
+background-position: center bottom;
+border-radius: 20px;
+overflow: hidden;
 }
 
 .tree-image {
-    max-width: 150px;
-    margin: 0 auto;
-    display: block;
+    max-height: 200px;
+    z-index: 2;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
 }
 
-.water-droplet {
+.tree-background {
     position: absolute;
-    width: 10px;
-    height: 15px;
-    background-color: #5aafff;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(90, 255, 117, 0.15) 0%, transparent 70%);
     border-radius: 50%;
-    animation: drop 2s linear forwards;
-    top: 0;
+    z-index: 1;
+    animation: pulse 3s infinite ease-in-out;
 }
 
-/* Нижняя навигация */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(13, 31, 74, 0.8);
-    backdrop-filter: blur(10px);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    z-index: 100;
-    padding: 10px 15px;
-}
-
-/* Кнопки */
-.btn {
-    border-radius: 12px;
-    padding: 10px 16px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-primary {
-    background-color: var(--secondary);
+.water-button, .collect-income-button, .fertilize-button, .improve-button, .autopilot-button {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #6B75E6, #3D50C7);
     color: white;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 16px;
+    padding: 14px 24px;
+    text-align: center;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), inset 0 2px 3px rgba(255, 255, 255, 0.25);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    cursor: pointer;
+    width: 100%;
+    z-index: 1;
 }
 
-.btn-primary:hover {
-    background-color: rgba(107, 117, 230, 0.8);
+.water-button::before, .collect-income-button::before, .fertilize-button::before, .improve-button::before, .autopilot-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.5s;
+    z-index: -1;
 }
 
-.btn-accent {
-    background-color: var(--accent);
-    color: var(--dark);
+.water-button:hover, .collect-income-button:hover, .fertilize-button:hover, .improve-button:hover, .autopilot-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), var(--blue-glow);
 }
 
-.btn-accent:hover {
-    background-color: rgba(90, 255, 117, 0.8);
+.water-button:hover::before, .collect-income-button:hover::before, .fertilize-button:hover::before, .improve-button:hover::before, .autopilot-button:hover::before {
+    left: 100%;
+    animation: shine 1.5s infinite;
 }
+
+.water-button:active, .collect-income-button:active, .fertilize-button:active, .improve-button:active, .autopilot-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.water-button {
+    background: var(--blue-gradient);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), var(--blue-glow);
+}
+
+.water-button:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), var(--blue-glow);
+}
+
+.collect-income-button {
+    background: var(--green-gradient);
+    color: #0D1F4A;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), var(--green-glow);
+}
+
+.collect-income-button:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), var(--green-glow);
+}
+
+.collect-income-button:hover {
+    background: linear-gradient(135deg, #3EFFA2, #5AFF75);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.fertilize-button {
+    background: var(--orange-gradient);
+    color: #0D1F4A;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), var(--orange-glow);
+}
+
+.fertilize-button:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), var(--orange-glow);
+}
+
+.improve-button {
+    background: var(--purple-gradient);
+    color: white;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), var(--purple-glow);
+}
+
+.improve-button:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), var(--purple-glow);
+}
+
+.autopilot-button {
+    background: var(--cyan-gradient);
+    color: #0D1F4A;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), var(--cyan-glow);
+}
+
+.autopilot-button:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), var(--cyan-glow);
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    20% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Динамические классы для прогресс-баров */
+.progress-width-0 { width: 0%; }
+.progress-width-1 { width: 1%; }
+.progress-width-2 { width: 2%; }
+.progress-width-3 { width: 3%; }
+.progress-width-4 { width: 4%; }
+.progress-width-5 { width: 5%; }
+.progress-width-6 { width: 6%; }
+.progress-width-7 { width: 7%; }
+.progress-width-8 { width: 8%; }
+.progress-width-9 { width: 9%; }
+.progress-width-10 { width: 10%; }
+.progress-width-11 { width: 11%; }
+.progress-width-12 { width: 12%; }
+.progress-width-13 { width: 13%; }
+.progress-width-14 { width: 14%; }
+.progress-width-15 { width: 15%; }
+.progress-width-16 { width: 16%; }
+.progress-width-17 { width: 17%; }
+.progress-width-18 { width: 18%; }
+.progress-width-19 { width: 19%; }
+.progress-width-20 { width: 20%; }
+.progress-width-21 { width: 21%; }
+.progress-width-22 { width: 22%; }
+.progress-width-23 { width: 23%; }
+.progress-width-24 { width: 24%; }
+.progress-width-25 { width: 25%; }
+.progress-width-26 { width: 26%; }
+.progress-width-27 { width: 27%; }
+.progress-width-28 { width: 28%; }
+.progress-width-29 { width: 29%; }
+.progress-width-30 { width: 30%; }
+.progress-width-31 { width: 31%; }
+.progress-width-32 { width: 32%; }
+.progress-width-33 { width: 33%; }
+.progress-width-34 { width: 34%; }
+.progress-width-35 { width: 35%; }
+.progress-width-36 { width: 36%; }
+.progress-width-37 { width: 37%; }
+.progress-width-38 { width: 38%; }
+.progress-width-39 { width: 39%; }
+.progress-width-40 { width: 40%; }
+.progress-width-41 { width: 41%; }
+.progress-width-42 { width: 42%; }
+.progress-width-43 { width: 43%; }
+.progress-width-44 { width: 44%; }
+.progress-width-45 { width: 45%; }
+.progress-width-46 { width: 46%; }
+.progress-width-47 { width: 47%; }
+.progress-width-48 { width: 48%; }
+.progress-width-49 { width: 49%; }
+.progress-width-50 { width: 50%; }
+.progress-width-51 { width: 51%; }
+.progress-width-52 { width: 52%; }
+.progress-width-53 { width: 53%; }
+.progress-width-54 { width: 54%; }
+.progress-width-55 { width: 55%; }
+.progress-width-56 { width: 56%; }
+.progress-width-57 { width: 57%; }
+.progress-width-58 { width: 58%; }
+.progress-width-59 { width: 59%; }
+.progress-width-60 { width: 60%; }
+.progress-width-61 { width: 61%; }
+.progress-width-62 { width: 62%; }
+.progress-width-63 { width: 63%; }
+.progress-width-64 { width: 64%; }
+.progress-width-65 { width: 65%; }
+.progress-width-66 { width: 66%; }
+.progress-width-67 { width: 67%; }
+.progress-width-68 { width: 68%; }
+.progress-width-69 { width: 69%; }
+.progress-width-70 { width: 70%; }
+.progress-width-71 { width: 71%; }
+.progress-width-72 { width: 72%; }
+.progress-width-73 { width: 73%; }
+.progress-width-74 { width: 74%; }
+.progress-width-75 { width: 75%; }
+.progress-width-76 { width: 76%; }
+.progress-width-77 { width: 77%; }
+.progress-width-78 { width: 78%; }
+.progress-width-79 { width: 79%; }
+.progress-width-80 { width: 80%; }
+.progress-width-81 { width: 81%; }
+.progress-width-82 { width: 82%; }
+.progress-width-83 { width: 83%; }
+.progress-width-84 { width: 84%; }
+.progress-width-85 { width: 85%; }
+.progress-width-86 { width: 86%; }
+.progress-width-87 { width: 87%; }
+.progress-width-88 { width: 88%; }
+.progress-width-89 { width: 89%; }
+.progress-width-90 { width: 90%; }
+.progress-width-91 { width: 91%; }
+.progress-width-92 { width: 92%; }
+.progress-width-93 { width: 93%; }
+.progress-width-94 { width: 94%; }
+.progress-width-95 { width: 95%; }
+.progress-width-96 { width: 96%; }
+.progress-width-97 { width: 97%; }
+.progress-width-98 { width: 98%; }
+.progress-width-99 { width: 99%; }
+.progress-width-100 { width: 100%; }
 
 /* Поля ввода */
-.input-field {
+input, select, textarea {
     background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
-    padding: 10px 16px;
-    color: white;
-    outline: none;
+    color: var(--text);
+    padding: 12px 18px;
+    width: 100%;
     transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
-.input-field:focus {
-    background-color: rgba(255, 255, 255, 0.15);
+input:focus, select:focus, textarea:focus {
+    outline: none;
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(90, 255, 117, 0.3);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Модальные окна */
-.modal {
-    background-color: rgba(13, 31, 74, 0.8);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
+input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Иконки деревьев и их стили */
 .tree-cf {
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
 }
 
 .tree-ton {
-    filter: drop-shadow(0 0 10px rgba(61, 139, 255, 0.3));
+    filter: drop-shadow(0 0 15px rgba(61, 139, 255, 0.5));
 }
 
 .tree-not {
-    filter: drop-shadow(0 0 10px rgba(90, 255, 117, 0.3));
+    filter: drop-shadow(0 0 15px rgba(90, 255, 117, 0.5));
+}
+
+.tree-card {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tree-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    background: linear-gradient(to top, rgba(90, 255, 117, 0.05), transparent);
+    z-index: -1;
 }
 
 /* Стили для страницы реферралов */
@@ -282,3 +719,334 @@ body {
 .light-theme {
     --text: #0D1F4A;
 } 
+
+/* Мобильная навигация */
+.mobile-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #17212b;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100;
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.3s ease;
+}
+
+.mobile-nav-item.active {
+    color: #fff;
+}
+
+.mobile-nav-item:hover {
+    color: #fff;
+}
+
+.mobile-nav-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.mobile-nav-text {
+    font-size: 12px;
+}
+
+/* Стили для мобильного интерфейса бота */
+.bot-container {
+    max-width: 100%;
+    padding: 15px;
+    margin: 0 auto;
+    background-color: #2b5278;
+    min-height: 100vh;
+    padding-bottom: 70px;
+}
+
+.bot-card {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.bot-header {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    color: #fff;
+}
+
+.bot-badge {
+    text-align: center;
+    padding: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    margin-top: 20px;
+    margin-bottom: 70px;
+}
+
+/* Стили для секции магазина */
+.shop-section {
+    background-color: #2b5278;
+    padding-bottom: 70px;
+}
+
+.balance-info {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tree-card {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.tree-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.tree-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.tree-image {
+    max-width: 100px;
+    margin: 15px auto;
+    display: block;
+}
+
+.tree-info {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.tree-free {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Стили для секции рефералов */
+.referral-section {
+    background-color: #2b5278;
+    padding-bottom: 70px;
+}
+
+.referral-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.referral-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.referral-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.referral-bonus {
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.referral-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.referral-link-container {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.referral-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+    word-break: break-all;
+    font-size: 14px;
+    text-align: center;
+}
+
+.referral-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    flex: 1;
+    background-color: #2b5278;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.referral-steps {
+    margin-top: 20px;
+}
+
+.step-item {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.step-number {
+    background-color: #2b5278;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.step-text {
+    font-size: 14px;
+}
+
+/* Стили для секции P2P */
+.p2p-section {
+    background-color: #2b5278;
+    padding-bottom: 70px;
+}
+
+.p2p-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: #17212b;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.p2p-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.p2p-tab.active {
+    background-color: #2b5278;
+    font-weight: bold;
+}
+
+.crypto-selector {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: #17212b;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.crypto-option {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.crypto-option.active {
+    background-color: #2b5278;
+    font-weight: bold;
+}
+
+.order-card {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.order-type {
+    font-weight: bold;
+}
+
+.order-type.buy {
+    color: #4CAF50;
+}
+
+.order-type.sell {
+    color: #F44336;
+}
+
+.order-price {
+    font-weight: bold;
+}
+
+.order-details {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.order-action {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.action-button {
+    background-color: #2b5278;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+}

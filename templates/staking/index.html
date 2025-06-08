@@ -1,75 +1,87 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/modern-staking.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="py-8">
-    <h1 class="text-2xl font-bold mb-6 text-center">Стейкинг</h1>
+<div class="staking-container">
+    <div class="staking-header">
+        <h1 class="staking-title">Стейкинг</h1>
+        <p class="staking-subtitle">Зарабатывайте пассивный доход, размещая свои токены в стейкинге</p>
+    </div>
     
-    <div class="card p-4 mb-6">
-        <div class="flex justify-between items-center">
-            <div class="flex space-x-4">
-                <div class="text-center">
-                    <div class="text-sm opacity-80">CF Токены</div>
-                    <div class="font-bold">{{ user.cf_balance }}</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-sm opacity-80">TON Токены</div>
-                    <div class="font-bold">{{ user.ton_balance }}</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-sm opacity-80">NOT Токены</div>
-                    <div class="font-bold">{{ user.not_balance }}</div>
-                </div>
+    <div class="balance-overview">
+        <div class="balance-tokens">
+            <div class="token-balance">
+                <div class="token-label">CF Токены</div>
+                <div class="token-value">{{ user.cf_balance }}</div>
             </div>
-            <button onclick="showStakeModal()" class="bg-accent/80 hover:bg-accent text-dark px-4 py-2 rounded-lg text-sm font-medium">
-                Стейкинг
-            </button>
+            <div class="token-balance">
+                <div class="token-label">TON Токены</div>
+                <div class="token-value">{{ user.ton_balance }}</div>
+            </div>
+            <div class="token-balance">
+                <div class="token-label">NOT Токены</div>
+                <div class="token-value">{{ user.not_balance }}</div>
+            </div>
+        </div>
+        <button class="staking-action">
+            Начать стейкинг
+        </button>
+    </div>
+    
+    <div class="staking-stats">
+        <div class="stat-card">
+            <div class="stat-label">Токенов в стейкинге</div>
+            <div class="stat-value">{{ total_staked }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Текущая доходность</div>
+            <div class="stat-value">{{ current_apy }}%</div>
+            <div class="stat-subtext">APY</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Заработано всего</div>
+            <div class="stat-value">{{ total_earned }}</div>
         </div>
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="card p-4 text-center">
-            <div class="text-sm opacity-80 mb-1">Токенов в стейкинге</div>
-            <div class="text-3xl font-bold">{{ total_staked }}</div>
-        </div>
-        <div class="card p-4 text-center">
-            <div class="text-sm opacity-80 mb-1">Текущая доходность</div>
-            <div class="text-3xl font-bold">{{ current_apy }}%</div>
-            <div class="text-xs opacity-70">APY</div>
-        </div>
-        <div class="card p-4 text-center">
-            <div class="text-sm opacity-80 mb-1">Заработано всего</div>
-            <div class="text-3xl font-bold">{{ total_earned }}</div>
-        </div>
-    </div>
-    
-    <div class="mb-8">
-        <h2 class="text-xl font-semibold mb-4">Стейкинг-планы</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="staking-plans-section">
+        <h2 class="section-title">Стейкинг-планы</h2>
+        <div class="plans-grid">
             {% for plan in staking_plans %}
-            <div class="card p-4 flex flex-col h-full">
-                <div class="mb-3">
-                    <h3 class="font-semibold text-lg">{{ plan.name }}</h3>
-                    <div class="text-xs opacity-70">{{ plan.lock_period }} дней блокировки</div>
+            <div class="plan-card">
+                <div class="plan-header">
+                    <h3 class="plan-title">{{ plan.name }}</h3>
+                    <div class="plan-duration">{{ plan.lock_period }} дней блокировки</div>
                 </div>
                 
-                <div class="space-y-2 mb-4">
-                    <div class="flex justify-between">
-                        <span class="text-sm opacity-80">Мин. сумма:</span>
-                        <span class="text-sm">{{ plan.min_amount }} {{ plan.token_type }}</span>
+                <div class="plan-details">
+                    <div class="plan-detail">
+                        <span class="detail-label">Мин. сумма:</span>
+                        <span class="detail-value">{{ plan.min_amount }} {{ plan.token_type }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm opacity-80">Макс. сумма:</span>
-                        <span class="text-sm">{{ plan.max_amount }} {{ plan.token_type }}</span>
+                    <div class="plan-detail">
+                        <span class="detail-label">Макс. сумма:</span>
+                        <span class="detail-value">{{ plan.max_amount }} {{ plan.token_type }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm opacity-80">Доходность:</span>
-                        <span class="text-sm text-accent">{{ plan.apy }}% APY</span>
+                    <div class="plan-detail">
+                        <span class="detail-label">Доходность:</span>
+                        <span class="detail-value highlight">{{ plan.apy }}% APY</span>
                     </div>
                 </div>
                 
                 <div class="mt-auto">
-                    <button onclick="showStakeModal('{{ plan.id }}', '{{ plan.token_type }}', {{ plan.min_amount }}, {{ plan.max_amount }}, {{ plan.apy }}, {{ plan.lock_period }})" 
-                           class="w-full bg-secondary hover:bg-blue-600 text-white py-2 rounded-lg text-sm font-medium transition">
+                    <button class="plan-action stake-button" 
+                           data-plan-id="{{ plan.id }}" 
+                           data-token-type="{{ plan.token_type }}" 
+                           data-min-amount="{{ plan.min_amount }}" 
+                           data-max-amount="{{ plan.max_amount }}" 
+                           data-apy="{{ plan.apy }}" 
+                           data-lock-period="{{ plan.lock_period }}">
                         Начать стейкинг
                     </button>
                 </div>
@@ -78,41 +90,35 @@
         </div>
     </div>
     
-    <div>
-        <h2 class="text-xl font-semibold mb-4">Ваши депозиты</h2>
-        <div class="card p-4">
-            <div class="space-y-2 mb-3">
-                <div class="flex justify-between text-sm font-medium opacity-80 p-2">
-                    <span>Токен</span>
-                    <span>Сумма</span>
-                    <span>APY</span>
-                    <span>Начало</span>
-                    <span>Окончание</span>
-                    <span>Статус</span>
-                </div>
-                <hr class="border-white/10">
+    <div class="user-deposits-section">
+        <h2 class="section-title">Ваши депозиты</h2>
+        <div class="deposits-card">
+            <div class="deposits-header">
+                <div class="header-cell">Токен</div>
+                <div class="header-cell">Сумма</div>
+                <div class="header-cell">APY</div>
+                <div class="header-cell">Начало</div>
+                <div class="header-cell">Окончание</div>
+                <div class="header-cell">Статус</div>
             </div>
             
-            <div class="max-h-96 overflow-y-auto space-y-2">
+            <div class="deposits-list">
                 {% for stake in user_stakes %}
-                <div class="p-2 hover:bg-white/5 rounded-lg transition">
-                    <div class="flex justify-between items-center">
-                        <div class="text-sm font-medium">{{ stake.token_type }}</div>
-                        <div class="text-sm">{{ stake.amount }} {{ stake.token_type }}</div>
-                        <div class="text-sm text-accent">{{ stake.apy }}%</div>
-                        <div class="text-sm">{{ stake.started_at|date:"d.m.Y" }}</div>
-                        <div class="text-sm">{{ stake.ends_at|date:"d.m.Y" }}</div>
-                        <div class="flex items-center">
-                            {% if stake.status == 'active' %}
-                            <span class="status-indicator status-active"></span>
-                            <span class="text-sm">Активен</span>
-                            {% elif stake.status == 'completed' %}
-                            <span class="status-indicator status-inactive"></span>
-                            <span class="text-sm">Завершен</span>
-                            {% elif stake.status == 'pending_withdrawal' %}
-                            <span class="status-indicator status-pending"></span>
-                            <span class="text-sm">Ожидает вывода</span>
-                            <button onclick="withdrawStake({{ stake.id }})" class="ml-2 bg-accent text-dark px-2 py-0.5 rounded text-xs">
+                <div class="deposit-item">
+                    <div class="deposit-row">
+                        <div class="deposit-cell deposit-token">{{ stake.token_type }}</div>
+                        <div class="deposit-cell deposit-amount">{{ stake.amount }} {{ stake.token_type }}</div>
+                        <div class="deposit-cell deposit-apy">{{ stake.apy }}%</div>
+                        <div class="deposit-cell deposit-date">{{ stake.created_at|date:"d.m.Y" }}</div>
+                        <div class="deposit-cell deposit-date">{{ stake.end_date|date:"d.m.Y" }}</div>
+                        <div class="deposit-cell">
+                            {% if stake.is_locked %}
+                            <span class="deposit-status locked">Заблокирован</span>
+                            {% elif stake.is_completed %}
+                            <span class="deposit-status completed">Завершен</span>
+                            {% else %}
+                            <span class="deposit-status active">Активен</span>
+                            <button class="withdraw-button" data-stake-id="{{ stake.id }}">
                                 Вывести
                             </button>
                             {% endif %}
@@ -120,7 +126,7 @@
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center py-8 opacity-70">
+                <div class="no-deposits">
                     У вас пока нет активных депозитов. Выберите стейкинг-план, чтобы начать зарабатывать.
                 </div>
                 {% endfor %}
@@ -129,56 +135,55 @@
     </div>
     
     <!-- Модальное окно стейкинга -->
-    <div id="stakeModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
-        <div class="bg-primary/90 backdrop-blur-lg p-6 rounded-2xl w-full max-w-md relative">
-            <button onclick="hideStakeModal()" class="absolute top-3 right-3 text-white/70 hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+    <div id="stakeModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">Стейкинг токенов</h2>
+                <button class="modal-close close-modal">&times;</button>
+            </div>
             
-            <h2 class="text-xl font-bold mb-4">Стейкинг токенов</h2>
-            
-            <form id="stakeForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Тип токена</label>
-                    <select id="token_type" name="token_type" class="w-full bg-white/10 border border-white/20 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-accent">
+            <form id="stakeForm" class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Тип токена</label>
+                    <select id="token_type" name="token_type" class="form-input">
                         <option value="CF">CF Token</option>
                         <option value="TON">TON Token</option>
                         <option value="NOT">NOT Token</option>
                     </select>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium mb-1">Сумма</label>
+                <div class="form-group">
+                    <label class="form-label">Сумма</label>
                     <input type="number" id="amount" name="amount" min="1" step="1" 
-                           class="w-full bg-white/10 border border-white/20 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                           class="form-input"
                            placeholder="Минимум: 100">
-                    <div id="amount-error" class="text-red-500 text-xs mt-1 hidden">
+                    <div id="amount-error" class="form-error hidden">
                         Сумма должна быть в пределах мин. и макс. значений
                     </div>
                 </div>
                 
-                <div class="bg-white/10 p-3 rounded-lg space-y-2">
-                    <div class="flex justify-between">
-                        <span class="text-sm opacity-80">Доходность (APY):</span>
-                        <span id="apy-display" class="text-sm text-accent">10%</span>
+                <div class="form-info">
+                    <div class="info-row">
+                        <span class="info-label">Доходность (APY):</span>
+                        <span id="apy-display" class="info-value highlight">10%</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm opacity-80">Период блокировки:</span>
-                        <span id="lock-period-display" class="text-sm">30 дней</span>
+                    <div class="info-row">
+                        <span class="info-label">Период блокировки:</span>
+                        <span id="lock-period-display" class="info-value">30 дней</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-sm opacity-80">Ожидаемая прибыль:</span>
-                        <span id="expected-profit" class="text-sm">0 CF</span>
+                    <div class="info-row">
+                        <span class="info-label">Ожидаемая прибыль:</span>
+                        <span id="expected-profit" class="info-value highlight">0 CF</span>
                     </div>
                 </div>
                 
                 <input type="hidden" id="plan_id" name="plan_id" value="">
                 
-                <div class="pt-2">
-                    <button type="button" onclick="submitStake()" 
-                            class="w-full bg-accent text-dark font-semibold py-3 rounded-lg hover:bg-green-500 transition">
+                <div class="modal-footer">
+                    <button type="button" class="modal-button secondary close-modal">
+                        Отмена
+                    </button>
+                    <button type="button" class="modal-button primary submit-stake">
                         Подтвердить стейкинг
                     </button>
                 </div>
@@ -194,6 +199,49 @@
     let currentMaxAmount = 10000;
     let currentApy = 10;
     let currentLockPeriod = 30;
+    let currentTokenType = 'CF';
+    
+    // Инициализация обработчиков событий после загрузки страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем обработчики для всех кнопок стейкинга
+        const stakeButtons = document.querySelectorAll('.stake-button');
+        stakeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const planId = this.getAttribute('data-plan-id');
+                const tokenType = this.getAttribute('data-token-type');
+                const minAmount = parseFloat(this.getAttribute('data-min-amount'));
+                const maxAmount = parseFloat(this.getAttribute('data-max-amount'));
+                const apy = parseFloat(this.getAttribute('data-apy'));
+                const lockPeriod = parseFloat(this.getAttribute('data-lock-period'));
+                
+                showStakeModal(planId, tokenType, minAmount, maxAmount, apy, lockPeriod);
+            });
+        });
+        
+        // Добавляем обработчик для кнопки стейкинга в верхней части страницы
+        const mainStakeButton = document.querySelector('.staking-action');
+        if (mainStakeButton) {
+            mainStakeButton.addEventListener('click', function() {
+                showStakeModal();
+            });
+        }
+        
+        // Добавляем обработчики для кнопок закрытия модального окна
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                hideStakeModal();
+            });
+        });
+        
+        // Добавляем обработчик для кнопки подтверждения стейкинга
+        const submitStakeButton = document.querySelector('.submit-stake');
+        if (submitStakeButton) {
+            submitStakeButton.addEventListener('click', function() {
+                submitStake();
+            });
+        }
+    });
     
     // Функция для показа модального окна стейкинга
     function showStakeModal(planId = null, tokenType = 'CF', minAmount = 100, maxAmount = 10000, apy = 10, lockPeriod = 30) {
@@ -202,6 +250,7 @@
         currentMaxAmount = maxAmount;
         currentApy = apy;
         currentLockPeriod = lockPeriod;
+        currentTokenType = tokenType;
         
         document.getElementById('plan_id').value = planId;
         document.getElementById('token_type').value = tokenType;
@@ -214,7 +263,7 @@
         document.getElementById('lock-period-display').textContent = lockPeriod + ' дней';
         
         // Показываем модальное окно
-        document.getElementById('stakeModal').classList.remove('hidden');
+        document.getElementById('stakeModal').classList.add('active');
         
         // Добавляем обработчик события для расчета ожидаемой прибыли
         document.getElementById('amount').addEventListener('input', calculateExpectedProfit);
@@ -222,7 +271,7 @@
     
     // Функция для скрытия модального окна стейкинга
     function hideStakeModal() {
-        document.getElementById('stakeModal').classList.add('hidden');
+        document.getElementById('stakeModal').classList.remove('active');
         document.getElementById('amount-error').classList.add('hidden');
     }
     
@@ -279,6 +328,18 @@
             alert('Произошла ошибка при отправке запроса');
         });
     }
+    
+    // Инициализация обработчиков для кнопок вывода
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем обработчики для всех кнопок вывода
+        const withdrawButtons = document.querySelectorAll('.withdraw-button');
+        withdrawButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const stakeId = this.getAttribute('data-stake-id');
+                withdrawStake(stakeId);
+            });
+        });
+    });
     
     // Функция для вывода средств из стейкинга
     function withdrawStake(stakeId) {

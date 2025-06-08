@@ -15,58 +15,102 @@
     </div>
     
     <!-- Информация о дереве -->
-    <div class="card p-4 mb-6">
-        <div class="tree-container">
-            <img src="/static/images/tree_{{ tree.level }}.png" alt="{{ tree.crypto_type|upper }} Tree" class="tree-image animate-float tree-{{ tree.crypto_type }}">
+    <div class="blue-card mb-4">
+        <div class="info-block-title">Криптоферма</div>
+        <div class="info-block-value">Создано CF: 1 000 000 000</div>
+        <div class="text-sm mt-2 text-blue-300">Выращено: 10 000</div>
+    </div>
+
+    <div class="blue-card mb-4">
+        <div class="text-center mb-4">
+            <span class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">Выращено: {{ tree.income_per_hour }} {{ tree.crypto_type|upper }}</span>
         </div>
         
-        <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-primary/30 p-3 rounded-lg">
-                <div class="text-xs opacity-70">Уровень:</div>
-                <div class="font-semibold">{{ tree.level }}</div>
+        <div class="tree-container">
+            <img src="/static/images/tree_{{ tree.level }}.png" alt="{{ tree.crypto_type|upper }} Tree" class="tree-image tree-{{ tree.crypto_type }}">
+            <!-- Декоративные элементы добавляются динамически через JavaScript -->
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="info-block">
+                <div class="text-sm text-blue-300">Уровень</div>
+                <div class="info-block-value">{{ tree.level }}</div>
             </div>
-            <div class="bg-primary/30 p-3 rounded-lg">
-                <div class="text-xs opacity-70">Доход в час:</div>
-                <div class="font-semibold">{{ tree.income_per_hour }} {{ tree.crypto_type|upper }}/час</div>
+            <div class="info-block">
+                <div class="text-sm text-blue-300">Доход в час</div>
+                <div class="info-block-value">{{ tree.income_per_hour }} {{ tree.crypto_type|upper }}</div>
+            </div>
+            <div class="info-block">
+                <div class="text-sm text-blue-300">Собрано веток</div>
+                <div class="info-block-value">{{ tree.branches_collected }}</div>
+            </div>
+            <div class="info-block">
+                <div class="text-sm text-blue-300">Удобрение</div>
+                <div class="info-block-value">{{ tree.fertilizer }}</div>
             </div>
             {% if tree.crypto_type == 'cf' %}
-            <div class="bg-primary/30 p-3 rounded-lg">
-                <div class="text-xs opacity-70">Веток собрано:</div>
-                <div class="font-semibold">{{ tree.branches_collected }} / 
+            <div class="info-block">
+                <div class="text-sm text-blue-300">Веток до след. уровня</div>
+                <div class="info-block-value">{{ tree.branches_collected }} / 
                     {% if tree.level == 1 %}5{% elif tree.level == 2 %}12{% elif tree.level == 3 %}30{% elif tree.level == 4 %}75{% else %}Max{% endif %}
                 </div>
             </div>
             {% endif %}
-            <div class="bg-primary/30 p-3 rounded-lg">
-                <div class="text-xs opacity-70">Последний полив:</div>
-                <div class="font-semibold">{{ tree.last_watered|date:"d.m.Y H:i" }}</div>
+            <div class="info-block">
+                <div class="text-sm text-blue-300">Удобрение</div>
+                <div class="info-block-value">{% if fertilizer_active %}Активно ({{ fertilizer_remaining }} ч){% else %}Не активно{% endif %}</div>
+            </div>
+            <div class="info-block">
+                <div class="text-sm text-blue-300">Автополив</div>
+                <div class="info-block-value">{% if auto_water_enabled %}Активен ({{ auto_water_remaining }} ч){% else %}Не активен{% endif %}</div>
             </div>
         </div>
+        
+        <!-- Статус сообщения -->
+        <div class="status-message hidden" id="statusMessage"></div>
         
         <!-- Индикатор воды -->
-        <div class="mb-4">
-            <div class="flex justify-between text-xs mb-1">
-                <span>Вода</span>
-                <span>{{ tree.water_level }}%</span>
+        <div class="mb-6">
+            <div class="flex justify-between text-sm mb-2">
+                <span class="text-blue-300 font-medium">Вода</span>
+                <span class="text-white font-bold">{{ tree.water_level }}%</span>
             </div>
-            <div class="bg-primary/20 h-2 rounded-full overflow-hidden">
-                <div class="h-full bg-secondary" style="width: {{ tree.water_level }}%;"></div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill progress-width-{{ tree.water_level }}"></div>
             </div>
         </div>
         
-        <!-- Полив дерева -->
-        <div class="grid grid-cols-1 gap-3 mb-2">
-            <button data-tree-id="{{ tree.id }}" class="water-button bg-secondary hover:bg-secondary/80 transition text-center py-3 rounded-lg font-semibold">
-                Полить ({{ tree.water_cost }} CF)
+        <!-- Действия с деревом -->
+        <div class="grid grid-cols-1 gap-3 mb-4">
+            <button data-tree-id="{{ tree.id }}" class="water-button">
+                <i class="fas fa-tint mr-2"></i> Полить
+            </button>
+            
+            {% if auto_water_enabled %}
+            <button class="autopilot-button active block text-center" disabled>
+                <i class="fas fa-robot mr-2"></i> Автополив активен
+            </button>
+            {% else %}
+            <a href="{% url 'buy_autowater' tree.id %}" class="autopilot-button block text-center">
+                <i class="fas fa-robot mr-2"></i> Купить автополив
+            </a>
+            {% endif %}
+            
+            <button data-tree-id="{{ tree.id }}" class="fertilize-button">
+                <i class="fas fa-seedling mr-2"></i> Удобрить
+            </button>
+            
+            <button data-tree-id="{{ tree.id }}" class="improve-button">
+                <i class="fas fa-arrow-up mr-2"></i> Улучшить
             </button>
             
             {% if is_watered %}
-            <button data-tree-id="{{ tree.id }}" class="collect-income-button bg-accent text-dark hover:bg-accent/80 transition text-center py-3 rounded-lg font-semibold">
-                Собрать {{ tree.income_per_hour }} {{ tree.crypto_type|upper }}
+            <button data-tree-id="{{ tree.id }}" class="collect-income-button">
+                <i class="fas fa-coins mr-2"></i> Собрать доход
             </button>
             {% endif %}
             
-            <div class="tree-info bg-primary/20 p-3 rounded-lg text-center text-sm"></div>
+            <div class="tree-info text-center text-sm" id="status-message"></div>
         </div>
     </div>
     
@@ -163,17 +207,15 @@
                 </div>
             </div>
             <div class="mt-2 bg-primary/20 h-2 rounded-full overflow-hidden">
-                <div class="h-full bg-accent" style="width: 
-                    {% if tree.level == 1 %}
-                        {% widthratio tree.branches_collected 5 100 %}
-                    {% elif tree.level == 2 %}
-                        {% widthratio tree.branches_collected 12 100 %}
-                    {% elif tree.level == 3 %}
-                        {% widthratio tree.branches_collected 30 100 %}
-                    {% elif tree.level == 4 %}
-                        {% widthratio tree.branches_collected 75 100 %}
-                    {% endif %}%;">
-                </div>
+                {% if tree.level == 1 %}
+                    <div class="h-full bg-accent branch-progress" data-progress="{% widthratio tree.branches_collected 5 100 %}"></div>
+                {% elif tree.level == 2 %}
+                    <div class="h-full bg-accent branch-progress" data-progress="{% widthratio tree.branches_collected 12 100 %}"></div>
+                {% elif tree.level == 3 %}
+                    <div class="h-full bg-accent branch-progress" data-progress="{% widthratio tree.branches_collected 30 100 %}"></div>
+                {% elif tree.level == 4 %}
+                    <div class="h-full bg-accent branch-progress" data-progress="{% widthratio tree.branches_collected 75 100 %}"></div>
+                {% endif %}
             </div>
         </div>
         
@@ -216,26 +258,84 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Код для индикатора прогресса (анимация заполнения)
-        const progressBars = document.querySelectorAll('.bg-secondary, .bg-accent');
-        
-        progressBars.forEach(bar => {
-            const width = bar.style.width;
+        // Анимация прогресс-баров при загрузке страницы
+        document.querySelectorAll('.progress-bar-fill').forEach(bar => {
             bar.style.width = '0';
             
             setTimeout(() => {
                 bar.style.transition = 'width 1s ease-in-out';
-                bar.style.width = width;
+                // Если есть класс progress-width-XX, то ширина уже задана через CSS
             }, 300);
+        });
+        
+        // Обработка прогресс-баров с атрибутом data-progress
+        document.querySelectorAll('.branch-progress').forEach(bar => {
+            const progress = bar.getAttribute('data-progress');
+            bar.style.width = '0';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width 1s ease-in-out';
+                bar.style.width = progress + '%';
+            }, 300);
+        });
+        
+        // Функция показа статуса сообщения
+        function showStatusMessage(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'status-success', 'status-error');
+            statusMessage.classList.add(type === 'success' ? 'status-success' : 'status-error');
+            
+            // Анимация появления
+            statusMessage.style.opacity = '0';
+            statusMessage.style.transform = 'translateY(-10px)';
+            
+            setTimeout(() => {
+                statusMessage.style.transition = 'all 0.5s ease';
+                statusMessage.style.opacity = '1';
+                statusMessage.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // Автоматическое скрытие через 5 секунд
+            setTimeout(() => {
+                statusMessage.style.opacity = '0';
+                statusMessage.style.transform = 'translateY(-10px)';
+                
+                setTimeout(() => {
+                    statusMessage.classList.add('hidden');
+                }, 500);
+            }, 5000);
+        }
+        
+        // Добавление эффекта нажатия на кнопки
+        document.querySelectorAll('.water-button, .collect-income-button, .fertilize-button, .improve-button, .autopilot-button').forEach(button => {
+            button.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(2px)';
+                this.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+            });
+            
+            button.addEventListener('mouseup', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
         });
         
         // Обработка полива дерева
         const waterButton = document.querySelector('.water-button');
-        const treeInfo = document.querySelector('.tree-info');
         
         if (waterButton) {
             waterButton.addEventListener('click', function() {
                 const treeId = this.dataset.treeId;
+                const originalText = this.innerHTML;
+                
+                // Добавляем анимацию загрузки
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Обработка...';
+                this.disabled = true;
                 
                 fetch(`/tree/${treeId}/water/`, {
                     method: 'POST',
@@ -246,23 +346,83 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    // Возвращаем оригинальный текст кнопки
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    
                     if (data.status === 'success') {
-                        treeInfo.textContent = data.message;
-                        treeInfo.classList.add('success');
+                        // Показываем успешное сообщение
+                        showStatusMessage(data.message, 'success');
+                        
+                        // Добавляем анимацию капель воды
+                        addWaterDrops();
+                        
+                        // Обновляем страницу через 1.5 секунды
                         setTimeout(() => {
                             window.location.reload();
                         }, 1500);
                     } else {
-                        treeInfo.textContent = data.message;
-                        treeInfo.classList.add('error');
+                        // Показываем сообщение об ошибке
+                        showStatusMessage(data.message, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    treeInfo.textContent = 'Произошла ошибка при поливе дерева';
-                    treeInfo.classList.add('error');
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    showStatusMessage('Произошла ошибка при поливе дерева', 'error');
                 });
             });
+        }
+        
+        // Функция добавления анимации капель воды
+        function addWaterDrops() {
+            const treeContainer = document.querySelector('.tree-container');
+            if (!treeContainer) return;
+            
+            for (let i = 0; i < 10; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'water-drop';
+                drop.style.left = Math.random() * 80 + 10 + '%';
+                drop.style.animationDelay = (Math.random() * 0.5) + 's';
+                treeContainer.appendChild(drop);
+                
+                // Удаляем капли после анимации
+                setTimeout(() => {
+                    drop.remove();
+                }, 1500);
+            }
+        }
+        
+        // Функция добавления анимации монет
+        function addCoinAnimation() {
+            const treeContainer = document.querySelector('.tree-container');
+            if (!treeContainer) return;
+            
+            // Добавляем анимацию монет
+            for (let i = 0; i < 15; i++) {
+                const coin = document.createElement('div');
+                coin.className = 'coin-collect';
+                
+                // Разные размеры монет
+                const size = Math.random() * 20 + 15;
+                coin.style.width = size + 'px';
+                coin.style.height = size + 'px';
+                
+                // Разные начальные позиции
+                coin.style.left = Math.random() * 80 + 10 + '%';
+                coin.style.top = Math.random() * 80 + 10 + '%';
+                
+                // Разные задержки анимации
+                coin.style.animationDelay = (Math.random() * 0.5) + 's';
+                
+                treeContainer.appendChild(coin);
+                
+                // Удаляем монеты после анимации
+                setTimeout(() => {
+                    coin.remove();
+                }, 1500);
+            }
         }
         
         // Обработка сбора дохода
@@ -271,6 +431,11 @@
         if (collectButton) {
             collectButton.addEventListener('click', function() {
                 const treeId = this.dataset.treeId;
+                const originalText = this.innerHTML;
+                
+                // Добавляем анимацию загрузки
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Сбор...';
+                this.disabled = true;
                 
                 fetch(`/tree/${treeId}/collect/`, {
                     method: 'POST',
@@ -281,21 +446,31 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    // Возвращаем оригинальный текст кнопки
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    
                     if (data.status === 'success') {
-                        treeInfo.textContent = data.message;
-                        treeInfo.classList.add('success');
+                        // Показываем успешное сообщение
+                        showStatusMessage(data.message, 'success');
+                        
+                        // Добавляем анимацию монет
+                        addCoinAnimation();
+                        
+                        // Обновляем страницу через 1.5 секунды
                         setTimeout(() => {
                             window.location.reload();
                         }, 1500);
                     } else {
-                        treeInfo.textContent = data.message;
-                        treeInfo.classList.add('error');
+                        // Показываем сообщение об ошибке
+                        showStatusMessage(data.message, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    treeInfo.textContent = 'Произошла ошибка при сборе дохода';
-                    treeInfo.classList.add('error');
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    showStatusMessage('Произошла ошибка при сборе дохода', 'error');
                 });
             });
         }
@@ -315,6 +490,35 @@
             }
             return cookieValue;
         }
+        
+        // Добавление декоративных элементов
+        function addFloatingElements() {
+            const container = document.querySelector('.tree-container');
+            if (!container) return;
+            
+            // Добавляем монеты
+            for (let i = 0; i < 3; i++) {
+                const coin = document.createElement('div');
+                coin.className = 'floating-coin';
+                coin.style.top = Math.random() * 80 + 10 + '%';
+                coin.style.left = Math.random() * 80 + 10 + '%';
+                coin.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(coin);
+            }
+            
+            // Добавляем пузыри
+            for (let i = 0; i < 4; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'floating-bubble';
+                bubble.style.top = Math.random() * 80 + 10 + '%';
+                bubble.style.left = Math.random() * 80 + 10 + '%';
+                bubble.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(bubble);
+            }
+        }
+        
+        // Вызываем функцию добавления декоративных элементов
+        addFloatingElements();
     });
 </script>
-{% endblock %} 
+{% endblock %}

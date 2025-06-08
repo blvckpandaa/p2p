@@ -90,6 +90,69 @@ def buy_item(request, item_id):
         'new_balance': getattr(user, f"{item.price_token_type.lower()}_balance")
     })
 
+def buy_autowater(request, tree_id):
+    """Покупка автополива для конкретного дерева"""
+    from trees.models import Tree
+    from django.views.decorators.csrf import csrf_exempt, csrf_protect
+    from django.utils.decorators import method_decorator
+    
+    # Получаем дерево
+    tree = get_object_or_404(Tree, id=tree_id, user=request.user)
+    
+    # Находим товар автополива
+    try:
+        item = ShopItem.objects.get(type='auto_water', is_active=True)
+    except ShopItem.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Товар автополив не найден'})
+    
+    if request.method != 'POST':
+        # Если метод GET, просто отображаем страницу подтверждения
+        context = {
+            'tree': tree,
+            'item': item,
+            'user': request.user
+        }
+        return render(request, 'shop/buy_autowater.html', context)
+    
+    # Если метод POST - выполняем покупку
+    user = request.user
+    
+    # Проверяем достаточно ли средств
+    if item.price_token_type == 'CF' and user.cf_balance < item.price:
+        return JsonResponse({'status': 'error', 'message': 'Недостаточно CF токенов'})
+    elif item.price_token_type == 'TON' and user.ton_balance < item.price:
+        return JsonResponse({'status': 'error', 'message': 'Недостаточно TON токенов'})
+    elif item.price_token_type == 'NOT' and user.not_balance < item.price:
+        return JsonResponse({'status': 'error', 'message': 'Недостаточно NOT токенов'})
+    
+    # Списываем средства
+    if item.price_token_type == 'CF':
+        user.cf_balance -= item.price
+    elif item.price_token_type == 'TON':
+        user.ton_balance -= item.price
+    elif item.price_token_type == 'NOT':
+        user.not_balance -= item.price
+    
+    # Устанавливаем автополив для конкретного дерева
+    valid_until = timezone.now() + timezone.timedelta(hours=item.duration)
+    tree.auto_water_until = valid_until
+    tree.save()
+    user.save()
+    
+    # Записываем покупку
+    purchase = Purchase.objects.create(
+        user=user,
+        item=item,
+        price_paid=item.price,
+        valid_until=valid_until
+    )
+    
+    return JsonResponse({
+        'status': 'success',
+        'message': f'Вы успешно приобрели автополив для дерева {tree.type}',
+        'new_balance': getattr(user, f"{item.price_token_type.lower()}_balance")
+    })
+
 def buy_tree(request, tree_type):
     """Покупка дерева определенного типа"""
     if request.method != 'POST':

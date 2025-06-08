@@ -1,0 +1,337 @@
+/* Стили для мобильного интерфейса Telegram-бота */
+
+/* Общие стили */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #2b5278;
+    color: white;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+.container {
+    max-width: 100%;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+/* Заголовки */
+.header {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-left: 10px;
+}
+
+/* Нижняя навигация */
+.bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #17212b;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.nav-item.active {
+    color: #fff;
+}
+
+.nav-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.nav-text {
+    font-size: 12px;
+}
+
+/* Карточки */
+.card {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Магазин */
+.shop-section {
+    padding-bottom: 70px;
+}
+
+.balance-info {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.balance-value {
+    font-weight: bold;
+    color: #fff;
+}
+
+.tree-card {
+    background-color: #2b5278;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.tree-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.tree-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.tree-image {
+    max-width: 100px;
+    margin: 15px auto;
+    display: block;
+}
+
+.tree-info {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.tree-price {
+    font-weight: bold;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.free-label {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Реферальная программа */
+.referral-section {
+    padding-bottom: 70px;
+}
+
+.referral-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.referral-subheader {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.referral-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.referral-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+    word-break: break-all;
+    font-size: 14px;
+    text-align: center;
+}
+
+.referral-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    flex: 1;
+    background-color: #2b5278;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.referral-steps {
+    margin-top: 20px;
+}
+
+.step-item {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.step-number {
+    background-color: #2b5278;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.step-text {
+    font-size: 14px;
+}
+
+/* P2P раздел */
+.p2p-section {
+    padding-bottom: 70px;
+}
+
+.p2p-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: #17212b;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.p2p-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.p2p-tab.active {
+    background-color: #2b5278;
+    font-weight: bold;
+}
+
+.order-card {
+    background-color: #17212b;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.order-type {
+    font-weight: bold;
+}
+
+.order-type.buy {
+    color: #4CAF50;
+}
+
+.order-type.sell {
+    color: #F44336;
+}
+
+.order-price {
+    font-weight: bold;
+}
+
+.order-details {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.order-action {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.action-button {
+    background-color: #2b5278;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Бейдж бота */
+.bot-badge {
+    text-align: center;
+    padding: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    margin-top: 20px;
+    margin-bottom: 70px;
+}
+
+/* Анимации и эффекты */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.highlight {
+    animation: pulse 2s infinite;
+}
+
+/* Специальные стили для деревьев */
+.tree-cf {
+    color: #4CAF50;
+}
+
+.tree-ton {
+    color: #2196F3;
+}

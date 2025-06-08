@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Oxiri P2P - Создание дерева{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <!-- Верхняя навигация -->
+    <div class="flex items-center mb-6">
+        <a href="/tree/" class="mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 class="text-xl font-bold">Создание нового дерева</h1>
+    </div>
+    
+    <!-- Информация о криптоферме -->
+    <div class="blue-card mb-6">
+        <div class="info-block-title">Криптоферма</div>
+        <div class="info-block-value">Создано CF: 1 000 000 000</div>
+        <div class="text-sm mt-2 text-blue-300">Выращено: 10 000</div>
+    </div>
+
+    <!-- Форма создания дерева -->
+    <div class="blue-card p-6">
+        <h2 class="text-lg font-semibold mb-4 text-center">Выберите тип дерева</h2>
+        
+        <form method="post" action="{% url 'create_tree' %}">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- CF Дерево -->
+                <div class="tree-option">
+                    <input type="radio" name="tree_type" id="tree_cf" value="CF" checked class="hidden tree-radio">
+                    <label for="tree_cf" class="tree-option-label">
+                        <div class="tree-container-option">
+                            <img src="/static/images/tree_1.png" alt="CF Tree" class="tree-image-option tree-cf">
+                        </div>
+                        <div class="tree-option-info">
+                            <h3 class="text-lg font-bold">CF Дерево</h3>
+                            <p class="text-sm text-blue-300 mb-2">Начальный доход: 1 CF/час</p>
+                            <ul class="text-sm">
+                                <li class="flex items-center mb-1">
+                                    <svg class="w-4 h-4 mr-2 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Стандартный рост
+                                </li>
+                                <li class="flex items-center mb-1">
+                                    <svg class="w-4 h-4 mr-2 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Можно улучшать до 5 уровня
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Доступны все улучшения
+                                </li>
+                            </ul>
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- TON Дерево -->
+                <div class="tree-option">
+                    <input type="radio" name="tree_type" id="tree_ton" value="TON" class="hidden tree-radio">
+                    <label for="tree_ton" class="tree-option-label">
+                        <div class="tree-container-option">
+                            <img src="/static/images/tree_1.png" alt="TON Tree" class="tree-image-option tree-ton">
+                        </div>
+                        <div class="tree-option-info">
+                            <h3 class="text-lg font-bold">TON Дерево</h3>
+                            <p class="text-sm text-blue-300 mb-2">Начальный доход: 0.1 TON/час</p>
+                            <ul class="text-sm">
+                                <li class="flex items-center mb-1">
+                                    <svg class="w-4 h-4 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Медленный рост
+                                </li>
+                                <li class="flex items-center mb-1">
+                                    <svg class="w-4 h-4 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Можно улучшать до 3 уровня
+                                </li>
+                                <li class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Высокая ценность токенов
+                                </li>
+                            </ul>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button type="submit" class="bg-gradient-to-r from-green-500 to-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-green-600 hover:to-blue-700 transition">
+                    Создать дерево
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .tree-container-option {
+        height: 120px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+    
+    .tree-image-option {
+        height: 100px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    
+    .tree-cf {
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6));
+    }
+    
+    .tree-ton {
+        filter: drop-shadow(0 0 8px rgba(0, 128, 255, 0.6));
+    }
+    
+    .tree-option-label {
+        display: block;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        background-color: rgba(30, 58, 138, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .tree-option-label:hover {
+        border-color: rgba(59, 130, 246, 0.6);
+        background-color: rgba(30, 58, 138, 0.4);
+    }
+    
+    .tree-radio:checked + .tree-option-label {
+        border-color: rgba(59, 130, 246, 1);
+        background-color: rgba(30, 58, 138, 0.5);
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    
+    .tree-radio:checked + .tree-option-label .tree-image-option {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}

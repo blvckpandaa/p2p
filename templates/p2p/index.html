@@ -4,50 +4,49 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="/static/css/p2p.css">
+<link rel="stylesheet" href="/static/css/modern-p2p.css">
 <script src="/static/js/p2p.js"></script>
 {% endblock %}
 
 {% block content %}
-<div class="py-6">
+<div class="p2p-container">
     <!-- Заголовок и кнопки переключения -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-xl font-bold">P2P Обмен</h1>
-        <div class="flex space-x-2">
-            <a href="?action=buy" class="px-4 py-2 rounded-lg {% if action == 'buy' or not action %}bg-accent text-dark{% else %}bg-primary/30{% endif %}">
+    <div class="p2p-header">
+        <h1 class="p2p-title">P2P Обмен</h1>
+        <div class="p2p-actions">
+            <a href="?action=buy" class="p2p-tab {% if action == 'buy' or not action %}active{% endif %}">
                 Купить
             </a>
-            <a href="?action=sell" class="px-4 py-2 rounded-lg {% if action == 'sell' %}bg-accent text-dark{% else %}bg-primary/30{% endif %}">
+            <a href="?action=sell" class="p2p-tab {% if action == 'sell' %}active{% endif %}">
                 Продать
             </a>
         </div>
     </div>
     
     <!-- Выбор криптовалюты -->
-    <div class="mb-6">
-        <div class="grid grid-cols-3 gap-2">
-            <a href="?action={{ action }}&crypto=cf" class="text-center py-3 rounded-lg {% if crypto == 'cf' or not crypto %}bg-primary/50{% else %}bg-primary/30{% endif %}">
-                CF
-            </a>
-            <a href="?action={{ action }}&crypto=ton" class="text-center py-3 rounded-lg {% if crypto == 'ton' %}bg-primary/50{% else %}bg-primary/30{% endif %}">
-                TON
-            </a>
-            <a href="?action={{ action }}&crypto=not" class="text-center py-3 rounded-lg {% if crypto == 'not' %}bg-primary/50{% else %}bg-primary/30{% endif %}">
-                NOT
-            </a>
-        </div>
+    <div class="crypto-selector">
+        <a href="?action={{ action }}&crypto=cf" class="crypto-option {% if crypto == 'cf' or not crypto %}active{% endif %}">
+            CF
+        </a>
+        <a href="?action={{ action }}&crypto=ton" class="crypto-option {% if crypto == 'ton' %}active{% endif %}">
+            TON
+        </a>
+        <a href="?action={{ action }}&crypto=not" class="crypto-option {% if crypto == 'not' %}active{% endif %}">
+            NOT
+        </a>
     </div>
     
     <!-- График цены CF -->
-    <div class="card p-4 mb-6">
-        <h2 class="text-lg font-semibold mb-4">Динамика цены CF</h2>
-        <div class="chart-container" style="position: relative; height:250px; width:100%">
+    <div class="chart-card">
+        <h2 class="chart-title">Динамика цены CF</h2>
+        <div class="chart-container">
             <canvas id="cfPriceChart"></canvas>
         </div>
     </div>
     
     <!-- Фильтры и сортировка -->
-    <div class="filter-section mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="filter-section">
+        <div class="filter-grid">
             <div>
                 <label for="filter-price" class="filter-label">Максимальная цена</label>
                 <input type="number" id="filter-price" class="filter-input" placeholder="Любая">
@@ -69,8 +68,8 @@
     
     <!-- Форма создания ордера -->
     {% if action == 'sell' %}
-    <div class="card p-4 mb-6">
-        <h2 class="text-lg font-semibold mb-4">Создать ордер на продажу</h2>
+    <div class="order-form-card">
+        <h2 class="order-form-title">Создать ордер на продажу</h2>
         <form class="p2p-form" action="/p2p/create_order/" method="post">
             {% csrf_token %}
             <input type="hidden" name="type" value="sell">
@@ -102,8 +101,8 @@
         </form>
     </div>
     {% else %}
-    <div class="card p-4 mb-6">
-        <h2 class="text-lg font-semibold mb-4">Создать ордер на покупку</h2>
+    <div class="order-form-card">
+        <h2 class="order-form-title">Создать ордер на покупку</h2>
         <form class="p2p-form" action="/p2p/create_order/" method="post">
             {% csrf_token %}
             <input type="hidden" name="type" value="buy">
@@ -137,58 +136,52 @@
     {% endif %}
     
     <!-- Список ордеров -->
-    <div class="mb-6">
-        <h2 class="text-lg font-semibold mb-4">Активные ордера</h2>
+    <div class="orders-section">
+        <h2 class="orders-title">Активные ордера</h2>
         
-        <div class="orders-list">
+        <div class="orders-container">
             {% if orders %}
                 {% for order in orders %}
-                <div class="card p-4 mb-3 order-card {% if order.type == 'buy' %}order-buy{% else %}order-sell{% endif %}"
+                <div class="order-card {% if order.type == 'buy' %}order-buy{% else %}order-sell{% endif %}"
                      data-price="{{ order.price_per_unit }}" 
                      data-amount="{{ order.amount }}" 
-                     data-min="{{ order.min_amount }}"
-                     data-timestamp="{{ order.created_at|date:'U' }}">
-                    <div class="flex justify-between items-center mb-2">
+                     data-date="{{ order.created_at|date:'YmdHis' }}">
+                    <div class="order-header">
                         <div>
-                            <span class="text-xs px-2 py-1 rounded-full {% if order.type == 'buy' %}bg-accent/20 text-accent{% else %}bg-secondary/20 text-white{% endif %}">
-                                {{ order.type|upper }}
-                            </span>
-                            <span class="text-sm ml-2">{{ order.token_type }}</span>
+                            {% if order.type == 'buy' %}
+                                <span class="order-type buy">ПОКУПКА</span>
+                            {% else %}
+                                <span class="order-type sell">ПРОДАЖА</span>
+                            {% endif %}
                         </div>
-                        <div class="text-sm">
-                            <span class="status-indicator {% if order.is_active %}status-active{% else %}status-inactive{% endif %}"></span>
+                        <div class="order-date">
                             {{ order.created_at|date:"d.m.Y H:i" }}
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <div class="bg-primary/20 p-2 rounded-lg">
-                            <div class="text-xs opacity-70">Количество:</div>
-                            <div class="font-semibold">{{ order.amount }} {{ order.token_type }}</div>
+                    <div class="order-info-grid">
+                        <div class="order-info-item">
+                            <div class="order-info-label">Количество:</div>
+                            <div class="order-info-value">{{ order.amount }} {{ order.token_type }}</div>
                         </div>
-                        <div class="bg-primary/20 p-2 rounded-lg">
-                            <div class="text-xs opacity-70">Цена за 1 {{ order.token_type }}:</div>
-                            <div class="font-semibold">{{ order.price_per_unit }} ₽</div>
+                        <div class="order-info-item">
+                            <div class="order-info-label">Цена за единицу:</div>
+                            <div class="order-info-value">{{ order.price_per_unit }} ₽</div>
                         </div>
                     </div>
                     
-                    <div class="flex justify-between items-center">
-                        <div class="text-sm">
-                            Мин. сумма: <span class="font-semibold">{{ order.min_amount }} ₽</span>
-                        </div>
-                        
-                        {% if order.user.id == request.user.id %}
-                        <form action="{% url 'toggle_order' %}" method="post" class="p2p-form">
-                            {% csrf_token %}
-                            <input type="hidden" name="order_id" value="{{ order.id }}">
-                            <button type="submit" class="px-3 py-1 rounded-lg bg-primary/30 text-xs">
-                                {% if order.is_active %}Деактивировать{% else %}Активировать{% endif %}
-                            </button>
-                        </form>
-                        {% else %}
-                        <a href="{% url 'order_detail' order.id %}" class="px-3 py-1 rounded-lg bg-accent text-dark text-xs">
-                            {% if order.type == 'buy' %}Продать{% else %}Купить{% endif %}
+                    <div class="order-actions">
+                        <a href="/p2p/order/{{ order.id }}/" class="order-action-button secondary">
+                            Подробнее
                         </a>
+                        {% if order.user != request.user %}
+                            <a href="/p2p/deal/{{ order.id }}/" class="order-action-button primary">
+                                {% if order.type == 'buy' %}Продать{% else %}Купить{% endif %}
+                            </a>
+                        {% else %}
+                            <a href="/p2p/cancel/{{ order.id }}/" class="order-action-button secondary" style="color: #FF5757;">
+                                Отменить
+                            </a>
                         {% endif %}
                     </div>
                 </div>
@@ -202,59 +195,19 @@
         </div>
     </div>
     
-    <!-- Мои активные сделки -->
-    {% if my_deals %}
-    <div class="mb-6">
-        <h2 class="text-lg font-semibold mb-4">Мои активные сделки</h2>
-        
-        {% for deal in my_deals %}
-        <div class="card p-4 mb-3">
-            <div class="flex justify-between items-center mb-2">
-                <div>
-                    <span class="text-xs px-2 py-1 rounded-full {% if deal.is_buyer %}bg-accent/20 text-accent{% else %}bg-secondary/20 text-white{% endif %}">
-                        {% if deal.is_buyer %}ПОКУПКА{% else %}ПРОДАЖА{% endif %}
-                    </span>
-                    <span class="text-sm ml-2">{{ deal.order.token_type }}</span>
-                </div>
-                <div class="text-sm">
-                    <span class="status-indicator status-pending"></span>
-                    В процессе
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2 mb-3">
-                <div class="bg-primary/20 p-2 rounded-lg">
-                    <div class="text-xs opacity-70">Количество:</div>
-                    <div class="font-semibold">{{ deal.amount }} {{ deal.order.token_type }}</div>
-                </div>
-                <div class="bg-primary/20 p-2 rounded-lg">
-                    <div class="text-xs opacity-70">Сумма:</div>
-                    <div class="font-semibold">{{ deal.total_price }} ₽</div>
-                </div>
-            </div>
-            
-            <a href="{% url 'deal_detail' deal.id %}" class="block w-full py-2 bg-accent text-dark text-center rounded-lg">
-                Перейти к сделке
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    <!-- История транзакций -->
-    <div class="mb-6">
-        <h2 class="text-lg font-semibold mb-4">История сделок</h2>
-        
+    <!-- История сделок -->
+    <div class="transactions-section">
+        <h2 class="transactions-title">Ваши сделки</h2>
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="transactions-table">
                 <thead>
                     <tr>
-                        <th class="text-left p-2">Дата</th>
-                        <th class="text-left p-2">Тип</th>
-                        <th class="text-left p-2">Токен</th>
-                        <th class="text-right p-2">Количество</th>
-                        <th class="text-right p-2">Цена</th>
-                        <th class="text-right p-2">Сумма</th>
+                        <th>Дата</th>
+                        <th>Тип</th>
+                        <th>Валюта</th>
+                        <th style="text-align: right;">Количество</th>
+                        <th style="text-align: right;">Цена</th>
+                        <th style="text-align: right;">Сумма</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -1,0 +1,465 @@
+/* Современные стили для реферальной системы */
+
+/* Основной контейнер реферальной системы */
+.referral-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Заголовок */
+.referral-header {
+    position: relative;
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.8), rgba(13, 31, 74, 0.9));
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.referral-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/static/images/referral-bg-pattern.png');
+    background-size: cover;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.referral-header-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.referral-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.referral-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Карточка с реферальной ссылкой */
+.referral-link-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.referral-link-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.referral-code-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-family: monospace;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #5AFF75;
+    position: relative;
+    overflow: hidden;
+}
+
+.referral-code-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(90, 255, 117, 0.2) 0%, transparent 70%);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+.referral-link {
+    background: rgba(26, 58, 126, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    word-break: break-all;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+}
+
+.referral-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.referral-button {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.referral-button.primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.referral-button.primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+.referral-button.secondary {
+    background: rgba(26, 58, 126, 0.5);
+    color: white;
+}
+
+.referral-button.secondary:hover {
+    background: rgba(26, 58, 126, 0.7);
+    transform: translateY(-2px);
+}
+
+.referral-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    20% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Статистика реферальной программы */
+.referral-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(26, 58, 126, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    background: rgba(26, 58, 126, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::after {
+    opacity: 1;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #5AFF75;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(90, 255, 117, 0.5);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Уровни реферальной программы */
+.referral-levels {
+    margin-bottom: 2rem;
+}
+
+.referral-levels-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.levels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.level-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.level-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.level-card.active {
+    border: 2px solid #5AFF75;
+    box-shadow: 0 0 20px rgba(90, 255, 117, 0.3);
+}
+
+.level-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.level-title {
+    font-weight: 600;
+    color: #5AFF75;
+    margin-bottom: 1rem;
+}
+
+.level-requirement {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.level-reward {
+    font-weight: 600;
+    color: white;
+}
+
+/* Список рефералов */
+.referrals-list {
+    margin-bottom: 2rem;
+}
+
+.referrals-list-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.referral-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.referral-table th {
+    background: rgba(26, 58, 126, 0.5);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+}
+
+.referral-table th:first-child {
+    border-top-left-radius: 16px;
+}
+
+.referral-table th:last-child {
+    border-top-right-radius: 16px;
+}
+
+.referral-table td {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.referral-table tr {
+    background: rgba(26, 58, 126, 0.3);
+    transition: all 0.3s ease;
+}
+
+.referral-table tr:hover {
+    background: rgba(26, 58, 126, 0.5);
+}
+
+.referral-user {
+    display: flex;
+    align-items: center;
+}
+
+.referral-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    overflow: hidden;
+}
+
+.referral-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.referral-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.referral-username {
+    font-weight: 600;
+    color: white;
+}
+
+.referral-date {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.referral-income {
+    font-weight: 600;
+    color: #5AFF75;
+}
+
+.referral-status {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.referral-status.active {
+    background: rgba(90, 255, 117, 0.2);
+    color: #5AFF75;
+}
+
+.referral-status.inactive {
+    background: rgba(255, 87, 87, 0.2);
+    color: #FF5757;
+}
+
+/* Пагинация */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.pagination-item {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.pagination-item.active {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+.pagination-item:not(.active) {
+    background: rgba(26, 58, 126, 0.3);
+    color: white;
+}
+
+.pagination-item:not(.active):hover {
+    background: rgba(26, 58, 126, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Медиа запросы для адаптивности */
+@media (max-width: 768px) {
+    .referral-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .levels-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .referral-buttons {
+        flex-direction: column;
+    }
+    
+    .referral-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
