@@ -1,0 +1,508 @@
+/* Современные стили для профиля пользователя */
+
+/* Основной контейнер профиля */
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Шапка профиля */
+.profile-header {
+    position: relative;
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.8), rgba(13, 31, 74, 0.9));
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/static/images/profile-bg-pattern.png');
+    background-size: cover;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.profile-header-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Аватар пользователя */
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(90, 255, 117, 0.7);
+    box-shadow: 0 0 20px rgba(90, 255, 117, 0.5);
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+    border-color: rgba(90, 255, 117, 1);
+    box-shadow: 0 0 30px rgba(90, 255, 117, 0.7);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+}
+
+/* Информация о пользователе */
+.profile-info {
+    text-align: center;
+}
+
+.profile-name {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.profile-username {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+/* Карточки баланса */
+.balance-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.balance-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), inset 0 0 25px rgba(62, 255, 162, 0.15);
+}
+
+.balance-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.balance-card:hover::after {
+    opacity: 1;
+}
+
+.balance-card-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.balance-card-title i {
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
+    color: rgba(90, 255, 117, 0.9);
+}
+
+.balance-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.balance-item:last-child {
+    border-bottom: none;
+}
+
+.balance-token {
+    display: flex;
+    align-items: center;
+}
+
+.token-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.token-icon.cf {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.token-icon.ton {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.token-icon.not {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+.token-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.token-name {
+    font-weight: 600;
+    color: white;
+}
+
+.token-description {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.token-amount {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #5AFF75;
+    text-shadow: 0 0 10px rgba(90, 255, 117, 0.5);
+}
+
+/* Секция деревьев */
+.trees-section {
+    margin-bottom: 2rem;
+}
+
+.tree-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(26, 58, 126, 0.3);
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tree-item:hover {
+    background: rgba(26, 58, 126, 0.5);
+    transform: translateX(5px);
+}
+
+.tree-info {
+    display: flex;
+    align-items: center;
+}
+
+.tree-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.tree-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/static/images/tree-icon-bg.png');
+    background-size: cover;
+    opacity: 0.2;
+}
+
+.tree-icon.cf {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.tree-icon.ton {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.tree-icon.not {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+.tree-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.tree-type {
+    font-weight: 600;
+    color: white;
+}
+
+.tree-level {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.tree-income {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #5AFF75;
+    display: flex;
+    align-items: center;
+}
+
+.tree-income i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Реферальная секция */
+.referral-section {
+    position: relative;
+}
+
+.referral-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.referral-code {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-family: monospace;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 2px;
+    color: #5AFF75;
+    position: relative;
+    overflow: hidden;
+}
+
+.referral-code::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(90, 255, 117, 0.2) 0%, transparent 70%);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+.referral-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.stat-card {
+    background: rgba(26, 58, 126, 0.3);
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: rgba(26, 58, 126, 0.5);
+    transform: translateY(-3px);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.copy-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.copy-btn:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+.copy-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    20% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.copy-btn.copied {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.referral-link {
+    background: rgba(26, 58, 126, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    word-break: break-all;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.referrals-list {
+    margin-top: 1.5rem;
+}
+
+.referrals-list-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.referral-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    background: rgba(26, 58, 126, 0.2);
+    border-radius: 12px;
+    margin-bottom: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.referral-item:hover {
+    background: rgba(26, 58, 126, 0.4);
+}
+
+.referral-user {
+    display: flex;
+    flex-direction: column;
+}
+
+.referral-username {
+    font-weight: 600;
+    color: white;
+}
+
+.referral-name {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.referral-date {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Анимации */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.float-animation {
+    animation: float 6s ease-in-out infinite;
+}

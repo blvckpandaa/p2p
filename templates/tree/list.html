@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Oxiri P2P - Мои деревья{% endblock %}
+
+{% block content %}
+<div class="py-6">
+    <!-- Верхняя навигация -->
+    <div class="flex items-center mb-6">
+        <a href="/" class="mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 class="text-xl font-bold">Мои деревья</h1>
+    </div>
+    
+    <!-- Информация о криптоферме -->
+    <div class="blue-card mb-4">
+        <div class="info-block-title">Криптоферма</div>
+        <div class="info-block-value">Создано CF: 1 000 000 000</div>
+        <div class="text-sm mt-2 text-blue-300">Выращено: 10 000</div>
+    </div>
+
+    <!-- Список деревьев -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for tree in trees %}
+        <div class="blue-card p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold">{{ tree.type }} Дерево</h2>
+                <span class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">Уровень {{ tree.level }}</span>
+            </div>
+            
+            <div class="tree-container-small mb-4">
+                <img src="/static/images/tree_{{ tree.level }}.png" alt="{{ tree.type }} Tree" class="tree-image-small tree-{{ tree.type|lower }}">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="info-block">
+                    <div class="text-sm text-blue-300">Доход в час</div>
+                    <div class="info-block-value">{{ tree.income_per_hour }} {{ tree.type }}</div>
+                </div>
+                <div class="info-block">
+                    <div class="text-sm text-blue-300">Собрано веток</div>
+                    <div class="info-block-value">{{ tree.branches_collected }}</div>
+                </div>
+                <div class="info-block">
+                    <div class="text-sm text-blue-300">Статус полива</div>
+                    <div class="info-block-value">{% if tree.is_watered %}Полито{% else %}Требует полива{% endif %}</div>
+                </div>
+                <div class="info-block">
+                    <div class="text-sm text-blue-300">Автополив</div>
+                    <div class="info-block-value">{% if tree.auto_water_until and tree.auto_water_until > now %}Активен{% else %}Не активен{% endif %}</div>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <a href="/tree/{{ tree.id }}/" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-6 rounded-full shadow-lg transition">
+                    Перейти к дереву
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Кнопка для создания нового дерева -->
+    <div class="mt-6 text-center">
+        <a href="/tree/create/" class="bg-gradient-to-r from-green-500 to-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-green-600 hover:to-blue-700 transition">
+            <i class="fas fa-plus mr-2"></i> Создать новое дерево
+        </a>
+    </div>
+</div>
+
+<style>
+    .tree-container-small {
+        height: 150px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+    
+    .tree-image-small {
+        height: 120px;
+        object-fit: contain;
+    }
+    
+    .tree-cf {
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6));
+    }
+    
+    .tree-ton {
+        filter: drop-shadow(0 0 8px rgba(0, 128, 255, 0.6));
+    }
+</style>
+{% endblock %}

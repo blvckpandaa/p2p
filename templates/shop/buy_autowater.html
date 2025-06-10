@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="max-w-md mx-auto bg-primary/20 backdrop-blur-md rounded-lg p-6 shadow-lg border border-accent/30">
+        <h1 class="text-2xl font-bold text-center mb-6">Покупка автополива</h1>
+        
+        <div class="mb-6 text-center">
+            <img src="/static/images/tree_{{ tree.level }}.png" alt="{{ tree.crypto_type|upper }} Tree" class="h-32 mx-auto">
+            <p class="mt-2 text-lg font-semibold">Дерево {{ tree.type }}</p>
+        </div>
+        
+        <div class="info-block mb-4">
+            <div class="info-block-title">Информация о товаре</div>
+            <div class="flex justify-between items-center mt-2">
+                <span>Название:</span>
+                <span class="info-block-value">{{ item.name }}</span>
+            </div>
+            <div class="flex justify-between items-center mt-1">
+                <span>Цена:</span>
+                <span class="info-block-value">{{ item.price }} {{ item.price_token_type }}</span>
+            </div>
+            <div class="flex justify-between items-center mt-1">
+                <span>Длительность:</span>
+                <span class="info-block-value">{{ item.duration }} часов</span>
+            </div>
+        </div>
+        
+        <div class="info-block mb-6">
+            <div class="info-block-title">Ваш баланс</div>
+            <div class="flex justify-between items-center mt-2">
+                <span>CF:</span>
+                <span class="info-block-value">{{ user.cf_balance }}</span>
+            </div>
+            <div class="flex justify-between items-center mt-1">
+                <span>TON:</span>
+                <span class="info-block-value">{{ user.ton_balance }}</span>
+            </div>
+            <div class="flex justify-between items-center mt-1">
+                <span>NOT:</span>
+                <span class="info-block-value">{{ user.not_balance }}</span>
+            </div>
+        </div>
+        
+        <div id="status-message" class="hidden mb-4"></div>
+        
+        <div class="flex justify-between">
+            <a href="{% url 'tree_detail' tree.id %}" class="btn-secondary px-6 py-2 rounded-lg flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Назад
+            </a>
+            <button id="buy-button" class="btn-primary px-6 py-2 rounded-lg flex items-center">
+                <i class="fas fa-shopping-cart mr-2"></i> Купить
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const buyButton = document.getElementById('buy-button');
+    const statusMessage = document.getElementById('status-message');
+    
+    buyButton.addEventListener('click', function() {
+        // Добавляем индикатор загрузки
+        buyButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Обработка...';
+        buyButton.disabled = true;
+        
+        // Отправляем запрос на покупку
+        fetch('', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Отображаем статус
+            statusMessage.classList.remove('hidden', 'status-success', 'status-error');
+            
+            if (data.status === 'success') {
+                statusMessage.classList.add('status-success');
+                statusMessage.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ' + data.message;
+                
+                // Перенаправляем на страницу дерева через 2 секунды
+                setTimeout(() => {
+                    window.location.href = "{% url 'tree_detail' tree.id %}";
+                }, 2000);
+            } else {
+                statusMessage.classList.add('status-error');
+                statusMessage.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> ' + data.message;
+                
+                // Восстанавливаем кнопку
+                buyButton.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Купить';
+                buyButton.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusMessage.classList.remove('hidden');
+            statusMessage.classList.add('status-error');
+            statusMessage.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Произошла ошибка при обработке запроса';
+            
+            // Восстанавливаем кнопку
+            buyButton.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i> Купить';
+            buyButton.disabled = false;
+        });
+    });
+    
+    // Функция для получения CSRF токена из cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

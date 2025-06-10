@@ -1,0 +1,495 @@
+/* Современные стили для P2P раздела */
+
+/* Основной контейнер P2P */
+.p2p-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Заголовок и кнопки переключения */
+.p2p-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.p2p-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.p2p-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.p2p-tab {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.p2p-tab.active {
+    background: linear-gradient(135deg, #5AFF75, #3CD755);
+    color: #0D1F4A;
+    box-shadow: 0 5px 15px rgba(90, 255, 117, 0.4);
+}
+
+.p2p-tab:not(.active) {
+    background: rgba(26, 58, 126, 0.3);
+    color: white;
+}
+
+.p2p-tab:not(.active):hover {
+    background: rgba(26, 58, 126, 0.5);
+    transform: translateY(-2px);
+}
+
+.p2p-tab::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.6s ease;
+}
+
+.p2p-tab:hover::after {
+    left: 100%;
+}
+
+/* Выбор криптовалюты */
+.crypto-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.crypto-option {
+    text-align: center;
+    padding: 1rem 0;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.crypto-option.active {
+    background: rgba(26, 58, 126, 0.6);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(90, 255, 117, 0.2);
+}
+
+.crypto-option:not(.active) {
+    background: rgba(26, 58, 126, 0.3);
+}
+
+.crypto-option:not(.active):hover {
+    background: rgba(26, 58, 126, 0.5);
+    transform: translateY(-3px);
+}
+
+.crypto-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.crypto-option:hover::before {
+    opacity: 1;
+}
+
+/* График цены */
+.chart-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), inset 0 0 25px rgba(62, 255, 162, 0.15);
+}
+
+.chart-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Фильтры и сортировка */
+.filter-section {
+    background: rgba(26, 58, 126, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.filter-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.filter-input, .sort-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(13, 31, 74, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.filter-input:focus, .sort-select:focus {
+    outline: none;
+    border-color: rgba(90, 255, 117, 0.5);
+    box-shadow: 0 0 10px rgba(90, 255, 117, 0.3);
+}
+
+.filter-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Форма создания ордера */
+.order-form-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.order-form-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(13, 31, 74, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: rgba(90, 255, 117, 0.5);
+    box-shadow: 0 0 10px rgba(90, 255, 117, 0.3);
+}
+
+.submit-button {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #5AFF75, #3CD755);
+    color: #0D1F4A;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(90, 255, 117, 0.4);
+}
+
+.submit-button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shine 3s infinite;
+}
+
+/* Список ордеров */
+.orders-section {
+    margin-bottom: 2rem;
+}
+
+.orders-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.order-card {
+    background: rgba(26, 58, 126, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.order-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    background: rgba(26, 58, 126, 0.4);
+}
+
+.order-card.order-buy {
+    border-left: 4px solid #5AFF75;
+}
+
+.order-card.order-sell {
+    border-left: 4px solid #FF5757;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.order-type {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.order-type.buy {
+    background: rgba(90, 255, 117, 0.2);
+    color: #5AFF75;
+}
+
+.order-type.sell {
+    background: rgba(255, 87, 87, 0.2);
+    color: #FF5757;
+}
+
+.order-date {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.order-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.order-info-item {
+    background: rgba(13, 31, 74, 0.3);
+    border-radius: 12px;
+    padding: 0.75rem;
+}
+
+.order-info-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.25rem;
+}
+
+.order-info-value {
+    font-weight: 600;
+    color: white;
+}
+
+.order-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.order-action-button {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.order-action-button.primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.order-action-button.primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+.order-action-button.secondary {
+    background: rgba(26, 58, 126, 0.5);
+    color: white;
+}
+
+.order-action-button.secondary:hover {
+    background: rgba(26, 58, 126, 0.7);
+    transform: translateY(-2px);
+}
+
+/* История сделок */
+.transactions-section {
+    margin-bottom: 2rem;
+}
+
+.transactions-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.transactions-table th {
+    background: rgba(26, 58, 126, 0.5);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+}
+
+.transactions-table th:first-child {
+    border-top-left-radius: 16px;
+}
+
+.transactions-table th:last-child {
+    border-top-right-radius: 16px;
+}
+
+.transactions-table td {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.transactions-table tr {
+    background: rgba(26, 58, 126, 0.3);
+    transition: all 0.3s ease;
+}
+
+.transactions-table tr:hover {
+    background: rgba(26, 58, 126, 0.5);
+}
+
+.transaction-type {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}
+
+.transaction-type.buy {
+    background: rgba(90, 255, 117, 0.2);
+    color: #5AFF75;
+}
+
+.transaction-type.sell {
+    background: rgba(255, 87, 87, 0.2);
+    color: #FF5757;
+}
+
+/* Анимации */
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    20% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Медиа запросы для адаптивности */
+@media (max-width: 768px) {
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .order-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .transactions-table {
+        display: block;
+        overflow-x: auto;
+    }
+}

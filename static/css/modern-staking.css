@@ -1,0 +1,566 @@
+/* Современные стили для страницы стейкинга */
+
+/* Основной контейнер стейкинга */
+.staking-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Заголовок страницы */
+.staking-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.staking-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #5AFF75, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 10px rgba(90, 255, 117, 0.3);
+}
+
+.staking-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Карточка баланса */
+.balance-overview {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.8), rgba(13, 31, 74, 0.9));
+    border-radius: 24px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 20px rgba(62, 255, 162, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.balance-tokens {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.token-balance {
+    text-align: center;
+}
+
+.token-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+}
+
+.token-value {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.staking-action {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #5AFF75, #3b82f6);
+    color: #0d1f4a;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(90, 255, 117, 0.3);
+}
+
+.staking-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(90, 255, 117, 0.4);
+}
+
+/* Статистика стейкинга */
+.staking-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), inset 0 0 25px rgba(62, 255, 162, 0.1);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.25rem;
+}
+
+.stat-subtext {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Секция стейкинг-планов */
+.staking-plans-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: white;
+    position: relative;
+    padding-left: 1rem;
+    display: inline-block;
+}
+
+.section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(to bottom, #5AFF75, #3b82f6);
+    border-radius: 2px;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.plan-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.plan-card:hover::after {
+    opacity: 1;
+}
+
+.plan-header {
+    margin-bottom: 1rem;
+}
+
+.plan-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: white;
+}
+
+.plan-duration {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.plan-details {
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.plan-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.detail-value {
+    font-size: 0.875rem;
+    color: white;
+}
+
+.detail-value.highlight {
+    color: #5AFF75;
+    font-weight: 600;
+}
+
+.plan-action {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font-weight: 600;
+    background: rgba(59, 130, 246, 0.5);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.plan-action:hover {
+    background: rgba(59, 130, 246, 0.8);
+}
+
+/* Секция депозитов пользователя */
+.user-deposits-section {
+    margin-bottom: 2rem;
+}
+
+.deposits-card {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.5), rgba(13, 31, 74, 0.7));
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), inset 0 0 20px rgba(62, 255, 162, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.deposits-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-cell {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.deposits-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.deposit-item {
+    padding: 0.75rem 0.5rem;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.deposit-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.deposit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.deposit-cell {
+    font-size: 0.875rem;
+    color: white;
+}
+
+.deposit-token {
+    font-weight: 600;
+}
+
+.deposit-amount {
+    color: #5AFF75;
+}
+
+.deposit-apy {
+    color: #3b82f6;
+}
+
+.deposit-date {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.deposit-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.deposit-status.active {
+    background: rgba(90, 255, 117, 0.2);
+    color: #5AFF75;
+}
+
+.deposit-status.locked {
+    background: rgba(255, 171, 64, 0.2);
+    color: #FFAB40;
+}
+
+.deposit-status.completed {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.withdraw-button {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.withdraw-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.no-deposits {
+    text-align: center;
+    padding: 3rem 0;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Модальное окно стейкинга */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    background: linear-gradient(135deg, rgba(26, 58, 126, 0.9), rgba(13, 31, 74, 0.95));
+    border-radius: 24px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 0 30px rgba(62, 255, 162, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active .modal-container {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    color: white;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.form-error {
+    color: #FF5757;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.form-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.info-value {
+    font-size: 0.875rem;
+    color: white;
+}
+
+.info-value.highlight {
+    color: #5AFF75;
+    font-weight: 600;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.modal-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-button.primary {
+    background: linear-gradient(135deg, #5AFF75, #3b82f6);
+    color: #0d1f4a;
+    box-shadow: 0 5px 15px rgba(90, 255, 117, 0.3);
+}
+
+.modal-button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(90, 255, 117, 0.4);
+}
+
+.modal-button.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.modal-button.secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Медиа запросы для адаптивности */
+@media (max-width: 1024px) {
+    .staking-stats,
+    .plans-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .staking-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .balance-overview {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .balance-tokens {
+        margin-bottom: 1rem;
+    }
+}
