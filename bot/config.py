@@ -8,7 +8,7 @@ except:
     pass
 
 # Настройки бота
-BOT_TOKEN = os.getenv("BOT_TOKEN", "7920987349:AAGm0Ed0uefXGMQ-VC6KyqaQhUXRnvRQ02w")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "ваш токен")
 # Для локальной разработки используйте ngrok или аналогичный сервис
 WEBAPP_URL = os.getenv("WEBAPP_URL", "https://b155-185-139-138-17.ngrok-free.app")
 ADMIN_USER_ID = os.getenv("ADMIN_USER_ID", "")
