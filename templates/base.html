@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -44,7 +45,23 @@
             min-height: 100vh;
             padding-bottom: 70px;
             overflow-x: hidden;
+            position: relative;
+    z-index: 0;
+
         }
+        body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(to bottom, #3D50C7, #6B75E6),
+        url('{% static 'images/bg.png' %}') no-repeat center center fixed;
+    background-size: cover;
+    background-blend-mode: overlay;
+    filter: blur(8px) brightness(1.03);
+    pointer-events: none;
+}
 
         .card {
             background-color: rgba(61, 80, 199, 0.3);
@@ -145,7 +162,13 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body style="
+    background:
+        linear-gradient(to bottom, #3D50C7, #6B75E6),
+        url('{% static 'images/bg.png' %}') no-repeat center center fixed;
+    background-size: cover;
+    background-blend-mode: overlay;
+">
     <!--
       В этом шаблоне больше нет JavaScript-редиректа.
       Единственная логика – это tg.expand() и смена цветовой темы.

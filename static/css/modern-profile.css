@@ -506,3 +506,30 @@
 .float-animation {
     animation: float 6s ease-in-out infinite;
 }
+
+
+.deposit-modal {
+    position: fixed;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+}
+.deposit-modal[style*="display: flex"] {
+    display: flex !important;
+}
+.modal-content {
+    background: #23272f;
+    color: #fff;
+    padding: 2em;
+    border-radius: 1em;
+    min-width: 320px;
+    max-width: 90vw;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.close-btn {
+    position: absolute; right: 1em; top: 1em; cursor: pointer;
+    font-size: 1.3em; color: #aaa;
+}

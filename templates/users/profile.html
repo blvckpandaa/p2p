@@ -20,7 +20,7 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <div class="profile-info">
                 <h1 class="profile-name">{{ user.get_full_name }}</h1>
                 {% if user.username %}
@@ -34,9 +34,9 @@
         <h2 class="balance-card-title"><i class="fas fa-wallet"></i> Ваш баланс</h2>
         <div class="balance-item">
             <div class="balance-token">
-                <div class="token-icon cf">CF</div>
+                <div class="token-icon cf">FLORA</div>
                 <div class="token-info">
-                    <span class="token-name">CF Токены</span>
+                    <span class="token-name">FLORA Токены</span>
                     <span class="token-description">Основная игровая валюта</span>
                 </div>
             </div>
@@ -80,11 +80,11 @@
         <div class="referral-card">
             <h2 class="balance-card-title"><i class="fas fa-users"></i> Реферальная программа</h2>
             <p>Пригласите друзей и получите бонусы!</p>
-            
+
             <div class="referral-code">
                 {{ referral_code }}
             </div>
-            
+
             <div class="referral-stats">
                 <div class="stat-card">
                     <div class="stat-label">Приглашено друзей</div>
@@ -95,11 +95,11 @@
                     <div class="stat-value">{{ referral_rewards }} CF</div>
                 </div>
             </div>
-            
+
             <button id="copy-btn" class="copy-btn">
                 <i class="fas fa-share-alt"></i> Поделиться реферальной ссылкой
             </button>
-            
+
             <div class="referral-link" id="ref-link">
                 https://t.me/p2pFloriya_bot?start={{ referral_code }}
             </div>
@@ -142,7 +142,7 @@
                 const originalText = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
                 copyBtn.classList.add('copied');
-                
+
                 setTimeout(() => {
                     copyBtn.innerHTML = originalText;
                     copyBtn.classList.remove('copied');

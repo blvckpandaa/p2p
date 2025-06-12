@@ -105,6 +105,7 @@ def profile_view(request):
         "referral_count": referral_count,
         "referral_rewards": referral_rewards,
         "referrals_info": referrals_info,
+        'recipient-address': 'UQAW1dSI8WjwEXnAQ98MJVYyOQ8D7egvHmKxAvH_XWRLjr-r'
     }
     return render(request, "users/profile.html", context)
 
@@ -144,3 +145,5 @@ def deposit_ton(request):
         )
         return redirect("profile")
     return redirect("profile")
+
+

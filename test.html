@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TonConnect Test</title>
+</head>
+<body>
+<div id="ton-connect-wallet"></div>
+<script src="https://unpkg.com/@tonconnect/ui@0.4.4/dist/tonconnect-ui.min.js"></script>
+<script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: "https://62e0-84-54-70-150.ngrok-free.app/static/tonconnect-manifest.json",
+        buttonRootId: "ton-connect-wallet"
+    });
+    tonConnectUI.onStatusChange(function(walletInfo) {
+        console.log("Wallet info:", walletInfo);
+    });
+</script>
+</body>
+</html>

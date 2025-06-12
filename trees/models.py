@@ -7,7 +7,7 @@ from users.models import User as TelegramUser
 
 class Tree(models.Model):
     TYPE_CHOICES = (
-        ('CF', 'CryptoFarm'),
+        ('CF', 'FLORA'),
         ('TON', 'TON-Дерево'),
     )
 

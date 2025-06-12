@@ -7,123 +7,55 @@
 <div class="py-8 max-w-4xl mx-auto">
     <h1 class="text-2xl font-bold mb-6 text-center">Мои деревья</h1>
 
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {# --- CF-деревья --- #}
+    <div class="space-y-4">
         {% for tree in cf_trees %}
-        <div class="card p-5 relative">
-            <div class="flex justify-between items-start mb-4">
-                <h2 class="text-xl font-semibold">CF-Дерево</h2>
-                <span class="bg-primary/30 text-white px-3 py-1 rounded-full text-sm">
-                    Уровень {{ tree.level }}
+        <div class="relative rounded-2xl shadow-lg overflow-hidden" style="background: url('{% static 'images/bg.png' %}') bottom/cover; min-height: 130px;">
+            <div class="relative flex flex-col items-center py-4 px-4">
+                <!-- Картинка дерева -->
+                <img src="/static/images/tree_{{ tree.level }}.png" alt="Tree" class="mb-2" style="height: 98px;">
+                <!-- Синяя подпись -->
+                <span class="text-blue-700 bg-white/80 rounded px-2 py-0.5 text-xs font-bold mt-1 mb-3 shadow">
+                    Дерево: FLORA
                 </span>
-            </div>
+                <!-- Инфо-блок -->
 
-            <div class="tree-container mb-4">
-                <img src="/static/images/tree_{{ tree.level }}.png"
-                     alt="CF Tree"
-                     class="tree-image animate-float">
+                <!-- Кнопка управление -->
+                <a href="{% url 'tree_detail' tree.id %}" class="bg-blue-500 text-white px-4 py-1 rounded-full font-semibold hover:bg-blue-600 transition shadow">
+                    Управление
+                </a>
             </div>
-
-            <div class="space-y-2 mb-6">
-                <div class="flex justify-between">
-                    <span>Доход:</span>
-                    <span class="font-medium">{{ tree.income_per_hour }} CF/час</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Статус:</span>
-                    <span class="font-medium">
-                        {% if tree.is_watered %}
-                            <span class="status-indicator status-active"></span>Активно
-                        {% else %}
-                            <span class="status-indicator status-inactive"></span>Нужен полив
-                        {% endif %}
-                    </span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Веток собрано:</span>
-                    <span class="font-medium">{{ tree.branches_collected }}</span>
-                </div>
-            </div>
-
-            <div class="flex justify-center">
+        </div>
+        {% endfor %}
+    {# --- TON-деревья --- #}
+    {% for tree in ton_trees %}
+        <div class="relative rounded-2xl shadow-lg overflow-hidden"
+             style="background: url('{% static 'images/bg.png' %}') bottom/cover; min-height: 130px;">
+            <div class="relative flex flex-col items-center py-4 px-4">
+                <!-- Картинка дерева -->
+                <img src="/static/images/tree_{{ tree.level }}.png" alt="TON Tree" class="mb-2" style="height: 98px;">
+                <!-- Синяя подпись (или своя подпись для TON) -->
+                <span class="text-blue-700 bg-white/80 rounded px-2 py-0.5 text-xs font-bold mt-1 mb-3 shadow">
+                    Дерево: TON
+                </span>
+                <!-- Инфо-блок (можно указать TON-доход и статус) -->
+                <!-- <div class="...">...</div> -->
                 <a href="{% url 'tree_detail' tree.id %}"
-                   class="bg-accent text-dark py-2 px-4 rounded-lg hover:bg-accent/80 transition">
+                   class="bg-blue-500 text-white px-4 py-1 rounded-full font-semibold hover:bg-blue-600 transition shadow mt-2">
                     Управление
                 </a>
             </div>
         </div>
         {% endfor %}
 
-        {# --- TON-деревья --- #}
-        <div class="card p-5 relative mt-6">
-    {% if ton_trees|length == 0 %}
-        {# Нет TON-дерева — показываем замок, размыто и кнопку #}
-        <div class="absolute inset-0 flex flex-col items-center justify-center z-10 bg-black/40 rounded-lg backdrop-blur-md">
-            <img src="{% static 'images/locked.png' %}" alt="lock" class="mx-auto mb-2" style="width: 80px; height: 80px;">
-            <div class="text-lg font-bold text-white mb-2">TON-дерево заблокировано</div>
-            <form action="{% url 'shop:buy_ton_tree' %}" method="post">
-                {% csrf_token %}
-                <button type="submit"
-                        class="bg-blue-500 text-white py-2 px-6 rounded-full font-semibold hover:bg-blue-600 transition">
-                    Купить за {{ ton_tree_price|default:"1" }} TON
-                </button>
-            </form>
-        </div>
-        <div class="opacity-30 select-none pointer-events-none">
-            <div class="tree-container mb-4">
-                <img src="{% static 'images/tree_1.png' %}" alt="TON Tree" class="tree-image animate-float">
-            </div>
-            <div class="text-center text-white font-semibold mb-2">TON-Дерево</div>
-            <div class="text-center text-white opacity-70">Получите доступ к новым возможностям!</div>
-        </div>
-    {% else %}
-        {# Обычная карточка TON-дерева, если оно уже куплено #}
-        {% for tree in ton_trees %}
-        <div class="tree-container mb-4">
-            <img src="/static/images/tree_{{ tree.level }}.png"
-                 alt="TON Tree"
-                 class="tree-image animate-float">
-        </div>
-        <div class="space-y-2 mb-6">
-            <div class="flex justify-between">
-                <span>Доход (на активную раздачу):</span>
-                <span class="font-medium">
-                    {{ tree.get_current_income }} TON/час
-                </span>
-            </div>
-            <div class="flex justify-between">
-                <span>Статус:</span>
-                <span class="font-medium">
-                    {% if tree.is_watered %}
-                        <span class="status-indicator status-active"></span>Активно
-                    {% else %}
-                        <span class="status-indicator status-inactive"></span>Нужен полив
-                    {% endif %}
-                </span>
-            </div>
-            <div class="flex justify-between">
-                <span>Веток собрано:</span>
-                <span class="font-medium">{{ tree.branches_collected }}</span>
-            </div>
-        </div>
-        <div class="flex justify-center">
-            <a href="{% url 'tree_detail' tree.id %}"
-               class="bg-accent text-dark py-2 px-4 rounded-lg hover:bg-accent/80 transition">
-                Управление
-            </a>
-        </div>
-        {% endfor %}
-    {% endif %}
-</div>
-
         {# Если у пользователя вообще нет деревьев (этот блок увидит только новичок) #}
         {% if cf_trees|length == 0 and ton_trees|length == 0 %}
-        <div class="card p-6 col-span-full text-center">
-            <p class="text-lg">У вас ещё нет деревьев. CF-дерево создаётся автоматически при первом входе.</p>
+        <div class="card p-2 col-span-full text-center">
+            <p class="text-xs">У вас ещё нет деревьев. CF-дерево создаётся автоматически при первом входе.</p>
         </div>
         {% endif %}
-    </div>
+</div>
 
+    </div>
 
 </div>
 {% endblock %}

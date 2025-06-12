@@ -5,12 +5,29 @@
 
 {% block content %}
 {% if messages %}
-  <ul>
+  <div class="flex flex-col gap-2 items-center mb-5">
     {% for message in messages %}
-      <li class="mb-2 p-2 rounded bg-green-200 text-green-800">{{ message }}</li>
+      {% if message.tags == "success" %}
+        <div class="w-full max-w-md rounded-xl px-4 py-3 bg-green-500/90 text-white shadow text-center font-semibold tracking-wide transition-all">
+          <i class="fa fa-check-circle mr-2"></i>{{ message }}
+        </div>
+      {% elif message.tags == "error" or message.tags == "danger" %}
+        <div class="w-full max-w-md rounded-xl px-4 py-3 bg-red-500/90 text-white shadow text-center font-semibold tracking-wide transition-all">
+          <i class="fa fa-times-circle mr-2"></i>{{ message }}
+        </div>
+      {% elif message.tags == "warning" %}
+        <div class="w-full max-w-md rounded-xl px-4 py-3 bg-yellow-400/90 text-black shadow text-center font-semibold tracking-wide transition-all">
+          <i class="fa fa-exclamation-triangle mr-2"></i>{{ message }}
+        </div>
+      {% else %}
+        <div class="w-full max-w-md rounded-xl px-4 py-3 bg-blue-500/80 text-white shadow text-center font-semibold tracking-wide transition-all">
+          <i class="fa fa-info-circle mr-2"></i>{{ message }}
+        </div>
+      {% endif %}
     {% endfor %}
-  </ul>
+  </div>
 {% endif %}
+
 <div class="mb-4 text-center">
   Баланс: <b>{{ user.ton_balance }}</b> TON
 </div>

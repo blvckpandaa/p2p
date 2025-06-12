@@ -1,0 +1,8 @@
+{
+  "manifest_version": "1",
+  "name": "Oxiri P2P",
+  "iconUrl": "https://62e0-84-54-70-150.ngrok-free.app/static/images/logo.png",
+  "url": "https://62e0-84-54-70-150.ngrok-free.app/",
+  "termsOfUseUrl": "https://62e0-84-54-70-150.ngrok-free.app/terms",
+  "privacyPolicyUrl": "https://62e0-84-54-70-150.ngrok-free.app/privacy"
+}
