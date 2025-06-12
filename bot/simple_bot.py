@@ -12,7 +12,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Токен вашего бота
-TOKEN = "7920987349:AAGm0Ed0uefXGMQ-VC6KyqaQhUXRnvRQ02w"
+TOKEN = "ваш токен"
 
 # URL веб-приложения
 WEBAPP_URL = "http://localhost:8000"
