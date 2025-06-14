@@ -191,5 +191,5 @@ GAME_SETTINGS = {
 }
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://62e0-84-54-70-150.ngrok-free.app",
+    "https://059b-213-230-86-75.ngrok-free.app",
 ]

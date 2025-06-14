@@ -1,7 +1,11 @@
 # users/views.py
+import json
+
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.crypto import get_random_string
+from django.views import View
 
 from cryptofarm import settings
 from trees.views import get_current_user
@@ -105,7 +109,8 @@ def profile_view(request):
         "referral_count": referral_count,
         "referral_rewards": referral_rewards,
         "referrals_info": referrals_info,
-        'recipient-address': 'UQAW1dSI8WjwEXnAQ98MJVYyOQ8D7egvHmKxAvH_XWRLjr-r'
+        'recipient-address': 'UQAW1dSI8WjwEXnAQ98MJVYyOQ8D7egvHmKxAvH_XWRLjr-r',
+        'ton_address': "UQAW1dSI8WjwEXnAQ98MJVYyOQ8D7egvHmKxAvH_XWRLjr-r"
     }
     return render(request, "users/profile.html", context)
 
@@ -146,4 +151,24 @@ def deposit_ton(request):
         return redirect("profile")
     return redirect("profile")
 
+
+def ton_manifest(request):
+    return JsonResponse({
+        "name": "Floriya TON Test TopUp",
+        "icons": [{
+            "src": request.build_absolute_uri('/static/images/logo-192.png'),
+            "sizes": "192x192",
+            "type": "image/png"
+        }],
+        "start_url": "/profile/",
+        "display": "standalone",
+        "permissions": ["ton_requestAccounts", "ton_send"]
+    })
+
+class TonPaymentTestAPI(View):
+    def post(self, request):
+        data = json.loads(request.body)
+        # просто логируем и отвечаем "ок"
+        print("TON Test Payment:", data)
+        return JsonResponse({'status': 'ok'})
 

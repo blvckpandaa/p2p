@@ -19,7 +19,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from users.views import ton_manifest
+
 urlpatterns = [
+    path('tonconnect-manifest.json', ton_manifest, name='ton-manifest'),
     path('admin/', admin.site.urls),
     path('', include('trees.urls')),  # Главная страница с деревьями
     path('shop/', include('shop.urls')),
